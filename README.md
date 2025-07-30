@@ -1,9 +1,9 @@
 # 프로젝트 생성
 
-## `expo init reminote`
+## `expo init inquoter`
 
 ```shell
-➜  Projects expo init reminote
+➜  Projects expo init inquoter
 WARNING: The legacy expo-cli does not support Node +17. Migrate to the new local Expo CLI: https://blog.expo.dev/the-new-expo-cli-f4250d8e3421.
 ┌───────────────────────────────────────────────────────────────────────────┐
 │                                                                           │
@@ -21,7 +21,7 @@ Migrate to using:
 › npx create-expo-app --template
 
 ✖ Choose a template: › minimal             bare and minimal, just the essentials to get you started
-➜  Projects npx create-expo-app reminote --template blank
+➜  Projects npx create-expo-app inquoter --template blank
 Creating an Expo project using the blank template.
 
 ✔ Downloaded and extracted project files.
@@ -44,7 +44,7 @@ found 0 vulnerabilities
 
 To run your project, navigate to the directory and run one of the following npm commands.
 
-- cd reminote
+- cd inquoter
 - npm run android
 - npm run ios
 - npm run web
@@ -53,14 +53,14 @@ To run your project, navigate to the directory and run one of the following npm 
 ## `npm run ios`
 
 ```
-➜  reminote git:(main) ✗ cd ..
-➜  Projects cd reminote
-➜  reminote git:(main) ✗ npm run ios
+➜  inquoter git:(main) ✗ cd ..
+➜  Projects cd inquoter
+➜  inquoter git:(main) ✗ npm run ios
 
-> reminote@1.0.0 ios
+> inquoter@1.0.0 ios
 > expo start --ios
 
-Starting project at /Users/minah.kim/Projects/reminote
+Starting project at /Users/minah.kim/Projects/inquoter
 Starting Metro Bundler
 › Opening exp://192.168.100.75:8081 on iPhone 16 Pro
 Downloading the Expo Go app [================================================================] 100% 0.0s
@@ -172,7 +172,7 @@ CopyEdit
 {
   "expo": {
     "ios": {
-      "bundleIdentifier": "com.minakim.myapp"
+      "bundleIdentifier": "com.minakim.inquoter"
     }
   }
 }
