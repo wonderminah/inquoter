@@ -58,7 +58,6 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>독서 필사</Text>
       <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
         <Text style={styles.buttonText}>새 필사 작성</Text>
       </TouchableOpacity>
@@ -170,7 +169,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    paddingTop: 50,
+    paddingTop: 70,
     paddingHorizontal: 20,
   },
   title: {
@@ -181,7 +180,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   button: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#a6969f',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,
