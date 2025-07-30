@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "reminote",
-    "slug": "reminote",
+    "name": "inquoter",
+    "slug": "inquoter",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,7 +14,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.minakim.myapp"
+      "bundleIdentifier": "com.minakim.inquoter",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -25,6 +28,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "491c6aa0-0836-4d99-85b3-5e58e2e5a9a8"
+      }
     }
   }
 }
