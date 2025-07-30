@@ -128,3 +128,112 @@ my-app/
 └── README.md              # 프로젝트 설명
 ```
 
+# 앱스토어 등록
+
+## ✅ 전체 흐름 요약 (iOS 기준)
+
+```
+scss
+
+
+CopyEdit
+[1] Apple 개발자 계정 가입
+[2] 앱 스토어용 앱 정보 등록 (App Store Connect)
+[3] Expo 앱 빌드
+[4] 앱 스토어에 업로드
+[5] 심사 → 승인 → 배포
+```
+
+------
+
+## 1. 🍏 Apple 개발자 계정 가입
+
+- https://developer.apple.com
+- 개인 또는 회사 계정 생성
+- 연간 $99 (개인 계정이면 개인명으로 배포됨)
+
+------
+
+## 2. 📋 App Store Connect에 앱 등록
+
+- https://appstoreconnect.apple.com
+- "My Apps" → `+` 버튼 → New App 생성
+  - 앱 이름, 번들 ID, 플랫폼(iOS), 언어 등 입력
+
+![image-20250731031402448](./README/image-20250731031402448.png)
+
+📌 번들 ID는 Expo `app.json` 또는 `app.config.js`에 적어야 해요:
+
+```
+json
+
+
+CopyEdit
+{
+  "expo": {
+    "ios": {
+      "bundleIdentifier": "com.minakim.myapp"
+    }
+  }
+}
+```
+
+------
+
+## 3. 🛠️ 앱 빌드 (Expo)
+
+Expo는 EAS(Build)라는 툴을 통해 배포용 `.ipa` 파일을 만들어줍니다.
+
+### 3-1. EAS CLI 설치
+
+```shell
+npm install -g eas-cli
+```
+
+### 3-2. Expo 계정 로그인
+
+```shell
+eas login
+```
+
+### 3-3. EAS 프로젝트 초기화
+
+```shell
+eas build:configure
+```
+
+### 3-4. iOS 앱 빌드
+
+```shell
+eas build --platform ios
+```
+
+- Expo가 알아서 인증서, 프로파일 등을 관리해줌
+- 빌드 완료되면 다운로드 링크를 줍니다
+
+------
+
+## 4. ☁️ 앱 업로드 (Transporter 사용)
+
+- Transporter 앱 (Mac App Store) 설치
+- `.ipa` 파일을 Drag & Drop 해서 업로드
+- 업로드 완료되면 App Store Connect에 빌드가 표시됨
+
+------
+
+## 5. ✅ 심사 및 배포
+
+- App Store Connect → 앱 상세 페이지 → 제출(Submit for Review)
+- 심사 완료 후 승인되면 앱스토어에 자동 배포됨
+
+------
+
+## 🔐 참고: 앱스토어 제출 전에 준비할 것
+
+| 항목               | 설명                                                   |
+| ------------------ | ------------------------------------------------------ |
+| 앱 아이콘          | `1024x1024` PNG (배경 불투명)                          |
+| 스크린샷           | iPhone 6.7", 6.1" 등용 최소 3장                        |
+| 개인정보 정책 링크 | 필요함 (외부 웹페이지 링크 또는 App Store에 직접 작성) |
+| 앱 설명/키워드     | 한글/영문 둘 다 가능                                   |
+
