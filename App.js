@@ -192,6 +192,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+    textAlign: 'center',
   },
   list: {
     flex: 1,
@@ -343,7 +344,7 @@ const styles = StyleSheet.create({
     flex: 0.45,
   },
   buttonDelete: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: '#8E8E93',
     flex: 0.45,
   },
 });
