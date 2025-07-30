@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, Modal, FlatList, Alert } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, Modal, FlatList, Alert, KeyboardAvoidingView, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { useState } from 'react';
+import { Platform } from 'react-native';
 
 export default function App() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -83,67 +84,79 @@ export default function App() {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>새 필사 작성</Text>
-            
-            <Text style={styles.inputLabel}>책 이름</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="책 이름을 입력하세요"
-              value={bookName}
-              onChangeText={setBookName}
-            />
-            
-            <Text style={styles.inputLabel}>저자</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="저자를 입력하세요"
-              value={author}
-              onChangeText={setAuthor}
-            />
-            
-            <Text style={styles.inputLabel}>페이지</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="페이지를 입력하세요"
-              value={page}
-              onChangeText={setPage}
-              keyboardType="numeric"
-            />
-            
-            <Text style={styles.inputLabel}>인상깊은 문장</Text>
-            <TextInput
-              style={[styles.textInput, styles.sentenceInput]}
-              placeholder="인상깊은 문장을 입력하세요"
-              value={sentence}
-              onChangeText={setSentence}
-              multiline={true}
-              numberOfLines={4}
-            />
-            
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => {
-                  setBookName('');
-                  setAuthor('');
-                  setPage('');
-                  setSentence('');
-                  setModalVisible(false);
-                }}
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.centeredView}>
+            <KeyboardAvoidingView 
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              style={styles.keyboardAvoidingView}
+            >
+              <ScrollView 
+                contentContainerStyle={styles.scrollViewContent}
+                showsVerticalScrollIndicator={false}
               >
-                <Text style={styles.buttonText}>취소</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.button, styles.buttonSave]}
-                onPress={addNote}
-              >
-                <Text style={styles.buttonText}>저장</Text>
-              </TouchableOpacity>
-            </View>
+                <View style={styles.modalView}>
+                  <Text style={styles.modalTitle}>새 필사 작성</Text>
+                  
+                  <Text style={styles.inputLabel}>책 이름</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="책 이름을 입력하세요"
+                    value={bookName}
+                    onChangeText={setBookName}
+                  />
+                  
+                  <Text style={styles.inputLabel}>저자</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="저자를 입력하세요"
+                    value={author}
+                    onChangeText={setAuthor}
+                  />
+                  
+                  <Text style={styles.inputLabel}>페이지</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="페이지를 입력하세요"
+                    value={page}
+                    onChangeText={setPage}
+                    keyboardType="numeric"
+                  />
+                  
+                  <Text style={styles.inputLabel}>인상깊은 문장</Text>
+                  <TextInput
+                    style={[styles.textInput, styles.sentenceInput]}
+                    placeholder="인상깊은 문장을 입력하세요"
+                    value={sentence}
+                    onChangeText={setSentence}
+                    multiline={true}
+                    numberOfLines={4}
+                  />
+                  
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                      style={[styles.button, styles.buttonClose]}
+                      onPress={() => {
+                        setBookName('');
+                        setAuthor('');
+                        setPage('');
+                        setSentence('');
+                        setModalVisible(false);
+                      }}
+                    >
+                      <Text style={styles.buttonText}>취소</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.button, styles.buttonSave]}
+                      onPress={addNote}
+                    >
+                      <Text style={styles.buttonText}>저장</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </ScrollView>
+            </KeyboardAvoidingView>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
 
       <Modal
@@ -272,6 +285,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+    width: '100%',
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
   },
   modalView: {
     margin: 20,
