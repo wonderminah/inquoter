@@ -8,6 +8,7 @@ export default function App() {
   const [selectedNoteId, setSelectedNoteId] = useState(null);
   const [bookName, setBookName] = useState('');
   const [author, setAuthor] = useState('');
+  const [page, setPage] = useState('');
   const [sentence, setSentence] = useState('');
   const [notes, setNotes] = useState([]);
 
@@ -17,12 +18,14 @@ export default function App() {
         id: Date.now().toString(),
         bookName: bookName,
         author: author,
+        page: page,
         sentence: sentence,
         date: new Date().toLocaleString()
       };
       setNotes([newNote, ...notes]);
       setBookName('');
       setAuthor('');
+      setPage('');
       setSentence('');
       setModalVisible(false);
     }
@@ -50,6 +53,7 @@ export default function App() {
       <View style={styles.bookInfo}>
         <Text style={styles.bookName}>{item.bookName}</Text>
         <Text style={styles.author}>저자: {item.author}</Text>
+        <Text style={styles.page}>페이지: {item.page}</Text>
       </View>
       <Text style={styles.sentence}>{item.sentence}</Text>
       <Text style={styles.noteDate}>{item.date}</Text>
@@ -99,10 +103,19 @@ export default function App() {
               onChangeText={setAuthor}
             />
             
-            <Text style={styles.inputLabel}>인상 깊은 문장</Text>
+            <Text style={styles.inputLabel}>페이지</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="페이지를 입력하세요"
+              value={page}
+              onChangeText={setPage}
+              keyboardType="numeric"
+            />
+            
+            <Text style={styles.inputLabel}>인상깊은 문장</Text>
             <TextInput
               style={[styles.textInput, styles.sentenceInput]}
-              placeholder="인상 깊은 문장을 입력하세요"
+              placeholder="인상깊은 문장을 입력하세요"
               value={sentence}
               onChangeText={setSentence}
               multiline={true}
@@ -115,6 +128,7 @@ export default function App() {
                 onPress={() => {
                   setBookName('');
                   setAuthor('');
+                  setPage('');
                   setSentence('');
                   setModalVisible(false);
                 }}
