@@ -116,6 +116,29 @@ function NotesScreen() {
     </View>
   );
 
+  const renderCard = ({ item }) => (
+    <View style={styles.cardItem}>
+      <View style={styles.cardHeader}>
+        <Text style={styles.cardBookName}>{item.bookName}</Text>
+        <TouchableOpacity 
+          style={styles.cardDeleteButton}
+          onPress={() => deleteNote(item.id)}
+        >
+          <Image 
+            source={require('./assets/free-icon-recycle-bin.png')}
+            style={styles.cardDeleteButtonImage}
+          />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.cardAuthorInfo}>
+        <Text style={styles.cardAuthor}>{item.author}</Text>
+        <Text style={styles.cardPage}>Page: {item.page}</Text>
+      </View>
+      <Text style={styles.cardSentence}>{item.sentence}</Text>
+      <Text style={styles.cardDate}>{item.date}</Text>
+    </View>
+  );
+
   return (
     <View style={styles.screenContainer}>
       <View style={styles.searchContainer}>
@@ -137,11 +160,14 @@ function NotesScreen() {
       </View>
       
       <FlatList
+        key={viewMode}
         data={filteredNotes}
-        renderItem={renderNote}
+        renderItem={viewMode === 'list' ? renderNote : renderCard}
         keyExtractor={item => item.id}
         style={styles.list}
         showsVerticalScrollIndicator={false}
+        numColumns={viewMode === 'card' ? 2 : 1}
+        columnWrapperStyle={viewMode === 'card' ? styles.cardRow : null}
         ListEmptyComponent={
           <Text style={styles.emptyText}>
             {searchText.trim() ? 'No search results found.' : 'No quotes yet. Write your first quote!'}
@@ -370,6 +396,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#ddd',
+    height: 48,
+    textAlignVertical: 'center',
   },
   buttonRow: {
     flexDirection: 'row',
@@ -465,6 +493,71 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999',
     textAlign: 'right',
+  },
+  cardRow: {
+    justifyContent: 'space-between',
+  },
+  cardItem: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 16,
+    marginBottom: 10,
+    // marginHorizontal: 4,
+    // flex: 1,
+    width: '48.5%',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  cardBookName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    flex: 1,
+  },
+  cardDeleteButton: {
+    padding: 4,
+  },
+  cardDeleteButtonImage: {
+    width: 16,
+    height: 16,
+    tintColor: '#ff6b6b',
+  },
+  cardAuthorInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  cardAuthor: {
+    fontSize: 12,
+    color: '#666',
+  },
+  cardPage: {
+    fontSize: 12,
+    color: '#666',
+  },
+  cardSentence: {
+    fontSize: 14,
+    color: '#333',
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+  cardDate: {
+    fontSize: 10,
+    color: '#999',
+    textAlign: 'right',
+    marginTop: 'auto',
   },
   emptyText: {
     textAlign: 'center',
