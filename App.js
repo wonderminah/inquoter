@@ -13,6 +13,7 @@ export default function App() {
   const [sentence, setSentence] = useState('');
   const [notes, setNotes] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const [activeTab, setActiveTab] = useState(0);
   
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').height)).current;
 
@@ -99,31 +100,54 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="검색어를 입력하세요"
-          value={searchText}
-          onChangeText={setSearchText}
+      <View style={styles.content}>
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="검색어를 입력하세요"
+            value={searchText}
+            onChangeText={setSearchText}
+          />
+        </View>
+        
+        <TouchableOpacity style={styles.button} onPress={openModal}>
+          <Text style={styles.buttonText}>새 필사 작성</Text>
+        </TouchableOpacity>
+        
+        <FlatList
+          data={filteredNotes}
+          renderItem={renderNote}
+          keyExtractor={item => item.id}
+          style={styles.list}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>
+              {searchText.trim() ? '검색 결과가 없습니다.' : '아직 필사가 없습니다. 새 필사를 작성해보세요!'}
+            </Text>
+          }
         />
       </View>
       
-      <TouchableOpacity style={styles.button} onPress={openModal}>
-        <Text style={styles.buttonText}>새 필사 작성</Text>
-      </TouchableOpacity>
-      
-      <FlatList
-        data={filteredNotes}
-        renderItem={renderNote}
-        keyExtractor={item => item.id}
-        style={styles.list}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>
-            {searchText.trim() ? '검색 결과가 없습니다.' : '아직 필사가 없습니다. 새 필사를 작성해보세요!'}
-          </Text>
-        }
-      />
+      <View style={styles.tabBar}>
+        <TouchableOpacity 
+          style={[styles.tabItem, activeTab === 0 && styles.activeTabItem]} 
+          onPress={() => setActiveTab(0)}
+        >
+          <Text style={[styles.tabText, activeTab === 0 && styles.activeTabText]}>서재</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.tabItem, activeTab === 1 && styles.activeTabItem]} 
+          onPress={() => setActiveTab(1)}
+        >
+          <Text style={[styles.tabText, activeTab === 1 && styles.activeTabText]}>필사</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.tabItem, activeTab === 2 && styles.activeTabItem]} 
+          onPress={() => setActiveTab(2)}
+        >
+          <Text style={[styles.tabText, activeTab === 2 && styles.activeTabText]}>설정</Text>
+        </TouchableOpacity>
+      </View>
       
       {modalVisible && (
         <View style={styles.overlay}>
@@ -243,6 +267,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  content: {
+    flex: 1,
     paddingTop: 70,
     paddingHorizontal: 20,
   },
@@ -469,5 +496,31 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 10,
     marginBottom: 10,
+  },
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+    paddingBottom: 20,
+    paddingTop: 10,
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  activeTabItem: {
+    borderTopWidth: 2,
+    borderTopColor: '#a6969f',
+  },
+  tabText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+  activeTabText: {
+    color: '#a6969f',
+    fontWeight: '600',
   },
 });
