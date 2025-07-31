@@ -28,6 +28,7 @@ function NotesScreen() {
   const [sentence, setSentence] = useState('');
   const [notes, setNotes] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const [viewMode, setViewMode] = useState('list'); // 'list' or 'card'
   
   const slideAnim = useRef(new Animated.Value(-Dimensions.get('window').height)).current;
 
@@ -126,9 +127,14 @@ function NotesScreen() {
         />
       </View>
       
-      <TouchableOpacity style={styles.button} onPress={openModal}>
-        <Text style={styles.buttonText}>Write New Quote</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonRow}>
+        <TouchableOpacity style={styles.button} onPress={openModal}>
+          <Text style={styles.buttonText}>Write New Quote</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.viewToggleButton} onPress={() => setViewMode(viewMode === 'list' ? 'card' : 'list')}>
+          <Text style={styles.viewToggleText}>{viewMode === 'list' ? '📋' : '📄'}</Text>
+        </TouchableOpacity>
+      </View>
       
       <FlatList
         data={filteredNotes}
@@ -365,13 +371,32 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
   },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   button: {
     backgroundColor: '#a6969f',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,
-    marginBottom: 20,
-    alignSelf: 'center',
+    flex: 1,
+    marginRight: 8,
+  },
+  viewToggleButton: {
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginLeft: 4,
+  },
+  viewToggleText: {
+    fontSize: 16,
+    textAlign: 'center',
   },
   buttonText: {
     color: '#fff',
