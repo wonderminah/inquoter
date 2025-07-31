@@ -327,6 +327,9 @@ function NotesScreen() {
 function SettingsScreen() {
   const [notificationEnabled, setNotificationEnabled] = useState(false);
   const [notificationTime, setNotificationTime] = useState('09:00');
+  const [timeModalVisible, setTimeModalVisible] = useState(false);
+  const [selectedHour, setSelectedHour] = useState(9);
+  const [selectedMinute, setSelectedMinute] = useState(0);
 
   // 알림 권한 요청
   const requestNotificationPermission = async () => {
@@ -405,15 +408,96 @@ function SettingsScreen() {
             <Text style={styles.settingLabel}>알림 시간</Text>
             <TouchableOpacity 
               style={styles.timeButton}
-              onPress={() => {
-                // 시간 선택 로직 (간단한 예시)
-                Alert.alert('알림 시간', '현재 09:00으로 설정되어 있습니다.');
-              }}
+              onPress={() => setTimeModalVisible(true)}
             >
               <Text style={styles.timeText}>{notificationTime}</Text>
             </TouchableOpacity>
           </View>
         )}
+        
+        <Modal
+          visible={timeModalVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setTimeModalVisible(false)}
+        >
+          <View style={styles.timeModalOverlay}>
+            <View style={styles.timeModalContent}>
+              <Text style={styles.timeModalTitle}>알림 시간 설정</Text>
+              
+              <View style={styles.timePickerContainer}>
+                <View style={styles.timePickerColumn}>
+                  <Text style={styles.timePickerLabel}>시간</Text>
+                  <ScrollView style={styles.timePickerScroll} showsVerticalScrollIndicator={false}>
+                    {Array.from({length: 24}, (_, i) => (
+                      <TouchableOpacity
+                        key={i}
+                        style={[
+                          styles.timePickerItem,
+                          selectedHour === i && styles.timePickerItemSelected
+                        ]}
+                        onPress={() => setSelectedHour(i)}
+                      >
+                        <Text style={[
+                          styles.timePickerItemText,
+                          selectedHour === i && styles.timePickerItemTextSelected
+                        ]}>
+                          {i.toString().padStart(2, '0')}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+                
+                <Text style={styles.timePickerSeparator}>:</Text>
+                
+                <View style={styles.timePickerColumn}>
+                  <Text style={styles.timePickerLabel}>분</Text>
+                  <ScrollView style={styles.timePickerScroll} showsVerticalScrollIndicator={false}>
+                    {Array.from({length: 60}, (_, i) => (
+                      <TouchableOpacity
+                        key={i}
+                        style={[
+                          styles.timePickerItem,
+                          selectedMinute === i && styles.timePickerItemSelected
+                        ]}
+                        onPress={() => setSelectedMinute(i)}
+                      >
+                        <Text style={[
+                          styles.timePickerItemText,
+                          selectedMinute === i && styles.timePickerItemTextSelected
+                        ]}>
+                          {i.toString().padStart(2, '0')}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              </View>
+              
+              <View style={styles.timeModalButtons}>
+                <TouchableOpacity
+                  style={[styles.timeModalButton, styles.timeModalButtonCancel]}
+                  onPress={() => setTimeModalVisible(false)}
+                >
+                  <Text style={styles.timeModalButtonText}>취소</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.timeModalButton, styles.timeModalButtonSave]}
+                  onPress={() => {
+                    const newTime = `${selectedHour.toString().padStart(2, '0')}:${selectedMinute.toString().padStart(2, '0')}`;
+                    setNotificationTime(newTime);
+                    setTimeModalVisible(false);
+                    // 알림 스케줄 업데이트
+                    scheduleNotification();
+                  }}
+                >
+                  <Text style={styles.timeModalButtonText}>저장</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
         
         <View style={styles.settingItem}>
           <Text style={styles.settingLabel}>앱 정보</Text>
@@ -560,6 +644,91 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     fontWeight: '500',
+  },
+  timeModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  timeModalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 24,
+    width: '80%',
+    maxWidth: 350,
+  },
+  timeModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  timePickerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  timePickerColumn: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  timePickerLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+  },
+  timePickerScroll: {
+    height: 120,
+    width: 80,
+  },
+  timePickerItem: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginVertical: 2,
+  },
+  timePickerItemSelected: {
+    backgroundColor: '#a6969f',
+  },
+  timePickerItemText: {
+    fontSize: 16,
+    color: '#333',
+    textAlign: 'center',
+  },
+  timePickerItemTextSelected: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  timePickerSeparator: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginHorizontal: 16,
+  },
+  timeModalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  timeModalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginHorizontal: 8,
+  },
+  timeModalButtonCancel: {
+    backgroundColor: '#f0f0f0',
+  },
+  timeModalButtonSave: {
+    backgroundColor: '#a6969f',
+  },
+  timeModalButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+    color: '#333',
   },
   searchContainer: {
     marginBottom: 15,
