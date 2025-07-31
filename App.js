@@ -630,16 +630,21 @@ const styles = StyleSheet.create({
   },
   textInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#f8f8f8',
     borderRadius: 8,
     padding: 12,
     width: '100%',
     marginBottom: 15,
     fontSize: 16,
+    height: 48,
+    textAlignVertical: 'center',
+    backgroundColor: '#f8f8f8',
   },
   sentenceInput: {
     minHeight: 100,
+    height: 100,
     textAlignVertical: 'top',
+    backgroundColor: '#f8f8f8',
   },
   buttonContainer: {
     flexDirection: 'row',
