@@ -1,10 +1,21 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, Modal, FlatList, Alert, KeyboardAvoidingView, ScrollView, TouchableWithoutFeedback, Keyboard, Animated, Dimensions, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, Modal, FlatList, Alert, KeyboardAvoidingView, ScrollView, TouchableWithoutFeedback, Keyboard, Animated, Dimensions, Image, Switch } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Platform } from 'react-native';
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
 
 const initialLayout = { width: Dimensions.get('window').width };
+
+// 알림 핸들러 설정
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 // Library screen component
 function LibraryScreen() {
@@ -31,6 +42,31 @@ function NotesScreen() {
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'card'
   
   const slideAnim = useRef(new Animated.Value(-Dimensions.get('window').height)).current;
+
+  // 랜덤 인용구 선택 함수
+  const getRandomQuote = () => {
+    if (notes.length === 0) return null;
+    const randomIndex = Math.floor(Math.random() * notes.length);
+    return notes[randomIndex];
+  };
+
+  // 랜덤 인용구 푸시 알림
+  const sendRandomQuoteNotification = async () => {
+    const randomQuote = getRandomQuote();
+    if (!randomQuote) return;
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: `"${randomQuote.bookName}"`,
+        body: `"${randomQuote.sentence}" - ${randomQuote.author}`,
+        data: { 
+          type: 'random_quote',
+          quoteId: randomQuote.id 
+        },
+      },
+      trigger: null, // 즉시 발송
+    });
+  };
 
   const openModal = () => {
     setModalVisible(true);
@@ -289,10 +325,100 @@ function NotesScreen() {
 
 // 설정 화면 컴포넌트
 function SettingsScreen() {
+  const [notificationEnabled, setNotificationEnabled] = useState(false);
+  const [notificationTime, setNotificationTime] = useState('09:00');
+
+  // 알림 권한 요청
+  const requestNotificationPermission = async () => {
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      
+      if (finalStatus !== 'granted') {
+        Alert.alert('알림 권한이 필요합니다', '설정에서 알림을 허용해주세요.');
+        return false;
+      }
+      
+      return true;
+    }
+    
+    Alert.alert('실제 기기에서만 알림이 작동합니다');
+    return false;
+  };
+
+  // 알림 스케줄링
+  const scheduleNotification = async () => {
+    const hasPermission = await requestNotificationPermission();
+    if (!hasPermission) return;
+
+    // 기존 알림 취소
+    await Notifications.cancelAllScheduledNotificationsAsync();
+
+    if (notificationEnabled) {
+      const [hour, minute] = notificationTime.split(':').map(Number);
+      
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "오늘의 인용구",
+          body: "새로운 인용구를 확인해보세요!",
+          data: { type: 'daily_quote' },
+        },
+        trigger: {
+          hour: hour,
+          minute: minute,
+          repeats: true,
+        },
+      });
+    }
+  };
+
+  // 알림 토글
+  const toggleNotification = async (value) => {
+    setNotificationEnabled(value);
+    if (value) {
+      await scheduleNotification();
+    } else {
+      await Notifications.cancelAllScheduledNotificationsAsync();
+    }
+  };
+
   return (
     <View style={styles.screenContainer}>
-      <View style={styles.placeholderContent}>
-        <Text style={styles.placeholderText}>Settings feature is coming soon.</Text>
+      <View style={styles.settingsContainer}>
+        <View style={styles.settingItem}>
+          <Text style={styles.settingLabel}>일일 인용구 알림</Text>
+          <Switch
+            value={notificationEnabled}
+            onValueChange={toggleNotification}
+            trackColor={{ false: '#767577', true: '#a6969f' }}
+            thumbColor={notificationEnabled ? '#f4f3f4' : '#f4f3f4'}
+          />
+        </View>
+        
+        {notificationEnabled && (
+          <View style={styles.settingItem}>
+            <Text style={styles.settingLabel}>알림 시간</Text>
+            <TouchableOpacity 
+              style={styles.timeButton}
+              onPress={() => {
+                // 시간 선택 로직 (간단한 예시)
+                Alert.alert('알림 시간', '현재 09:00으로 설정되어 있습니다.');
+              }}
+            >
+              <Text style={styles.timeText}>{notificationTime}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        
+        <View style={styles.settingItem}>
+          <Text style={styles.settingLabel}>앱 정보</Text>
+          <Text style={styles.settingDescription}>Inquoter v1.0.0</Text>
+        </View>
       </View>
     </View>
   );
@@ -384,6 +510,56 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#999',
     textAlign: 'center',
+  },
+  settingsContainer: {
+    flex: 1,
+    paddingTop: 20,
+  },
+  settingsTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 30,
+    textAlign: 'center',
+  },
+  settingItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    backgroundColor: '#fff',
+    marginBottom: 10,
+    borderRadius: 10,
+    height: 60,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  settingLabel: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '500',
+  },
+  settingDescription: {
+    fontSize: 16,
+    color: '#666',
+  },
+  timeButton: {
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 15,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  timeText: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '500',
   },
   searchContainer: {
     marginBottom: 15,
