@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, Modal, FlatList, Alert, KeyboardAvoidingView, ScrollView, TouchableWithoutFeedback, Keyboard, Animated, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, Modal, FlatList, Alert, KeyboardAvoidingView, ScrollView, TouchableWithoutFeedback, Keyboard, Animated, Dimensions, Image } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import { useState, useRef } from 'react';
 import { Platform } from 'react-native';
@@ -10,8 +10,6 @@ const initialLayout = { width: Dimensions.get('window').width };
 function LibraryScreen() {
   return (
     <View style={styles.screenContainer}>
-      <Text style={styles.screenTitle}>Library</Text>
-      <Text style={styles.screenDescription}>Manage the books I have read.</Text>
       <View style={styles.placeholderContent}>
         <Text style={styles.placeholderText}>Library feature is coming soon.</Text>
       </View>
@@ -31,7 +29,7 @@ function NotesScreen() {
   const [notes, setNotes] = useState([]);
   const [searchText, setSearchText] = useState('');
   
-  const slideAnim = useRef(new Animated.Value(Dimensions.get('window').height)).current;
+  const slideAnim = useRef(new Animated.Value(-Dimensions.get('window').height)).current;
 
   const openModal = () => {
     setModalVisible(true);
@@ -44,7 +42,7 @@ function NotesScreen() {
 
   const closeModal = () => {
     Animated.timing(slideAnim, {
-      toValue: Dimensions.get('window').height,
+      toValue: -Dimensions.get('window').height,
       duration: 300,
       useNativeDriver: true,
     }).start(() => {
@@ -100,7 +98,10 @@ function NotesScreen() {
         style={styles.deleteButton}
         onPress={() => deleteNote(item.id)}
       >
-        <Text style={styles.deleteButtonText}>🗑️</Text>
+        <Image 
+          source={require('./assets/free-icon-recycle-bin.png')}
+          style={styles.deleteButtonImage}
+        />
       </TouchableOpacity>
       <View style={styles.bookInfo}>
         <Text style={styles.bookName}>{item.bookName}</Text>
@@ -155,7 +156,9 @@ function NotesScreen() {
               }
             ]}
           >
-            <View style={styles.slideHandle} />
+            <View style={styles.modalHeader}>
+              <View style={styles.slideHandle} />
+            </View>
             <KeyboardAvoidingView 
               behavior={Platform.OS === "ios" ? "padding" : "height"}
               style={styles.keyboardAvoidingView}
@@ -256,8 +259,6 @@ function NotesScreen() {
 function SettingsScreen() {
   return (
     <View style={styles.screenContainer}>
-      <Text style={styles.screenTitle}>Settings</Text>
-      <Text style={styles.screenDescription}>Manage app settings.</Text>
       <View style={styles.placeholderContent}>
         <Text style={styles.placeholderText}>Settings feature is coming soon.</Text>
       </View>
@@ -268,9 +269,9 @@ function SettingsScreen() {
 export default function App() {
   const [index, setIndex] = useState(1); // 필사 탭을 기본으로 설정
   const [routes] = useState([
-    { key: 'library', title: 'Library', icon: '📚' },
-    { key: 'notes', title: 'Quotes', icon: '✍️' },
-    { key: 'settings', title: 'Settings', icon: '⚙️' },
+    { key: 'library', title: 'Library', icon: '' },
+    { key: 'notes', title: 'Quotes', icon: '' },
+    { key: 'settings', title: 'Settings', icon: '' },
   ]);
 
   const renderScene = ({ route }) => {
@@ -286,32 +287,33 @@ export default function App() {
     }
   };
 
-  const renderTabBar = (props) => (
-    <TabBar
-      {...props}
-      indicatorStyle={styles.indicator}
-      style={styles.tabBar}
-      labelStyle={styles.tabLabel}
-      activeColor="#a6969f"
-      inactiveColor="#666"
-      renderLabel={({ route, focused, color }) => (
-        <Text style={[styles.tabLabel, { color }]}>
-          {route.icon} {route.title}
-        </Text>
-      )}
-    />
-  );
+
 
   return (
     <View style={styles.container}>
-      <TabView
-        navigationState={{ index, routes }}
-        renderScene={renderScene}
-        renderTabBar={renderTabBar}
-        onIndexChange={setIndex}
-        initialLayout={initialLayout}
-        swipeEnabled={true}
-      />
+      <View style={styles.contentContainer}>
+        <TabView
+          navigationState={{ index, routes }}
+          renderScene={renderScene}
+          renderTabBar={() => null}
+          onIndexChange={setIndex}
+          initialLayout={initialLayout}
+          swipeEnabled={true}
+        />
+      </View>
+      <View style={styles.bottomTabBar}>
+        {routes.map((route, routeIndex) => (
+          <TouchableOpacity
+            key={route.key}
+            style={[styles.tabItem, index === routeIndex && styles.activeTabItem]}
+            onPress={() => setIndex(routeIndex)}
+          >
+            <Text style={[styles.tabLabel, index === routeIndex && styles.activeTabLabel]}>
+              {route.icon} {route.title}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
       <StatusBar style="auto" />
     </View>
   );
@@ -325,7 +327,7 @@ const styles = StyleSheet.create({
   screenContainer: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    paddingTop: 20,
+    paddingTop: 60,
     paddingHorizontal: 20,
   },
   screenTitle: {
@@ -400,9 +402,12 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
     zIndex: 1,
+    padding: 5,
   },
-  deleteButtonText: {
-    fontSize: 20,
+  deleteButtonImage: {
+    width: 20,
+    height: 20,
+    tintColor: '#FF3B30',
   },
   bookInfo: {
     marginBottom: 10,
@@ -459,12 +464,11 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   modalView: {
-    margin: 20,
+    flex: 1,
     backgroundColor: 'white',
     padding: 20,
     alignItems: 'center',
-    elevation: 5,
-    width: '90%',
+    width: '95%',
   },
   deleteModalView: {
     margin: 20,
@@ -550,14 +554,18 @@ const styles = StyleSheet.create({
   },
   slideView: {
     position: 'absolute',
-    bottom: 0,
+    top: 0,
     left: 0,
     right: 0,
+    bottom: 0,
     backgroundColor: 'white',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '90%',
-    minHeight: '50%',
+  },
+  modalHeader: {
+    paddingTop: 50,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    backgroundColor: '#fff',
   },
   slideHandle: {
     width: 40,
@@ -565,22 +573,35 @@ const styles = StyleSheet.create({
     backgroundColor: '#ddd',
     borderRadius: 2,
     alignSelf: 'center',
-    marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 15,
   },
-  tabBar: {
+  contentContainer: {
+    flex: 1,
+  },
+  bottomTabBar: {
+    flexDirection: 'row',
     backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    elevation: 0,
-    shadowOpacity: 0,
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+    paddingBottom: 20,
+    paddingTop: 10,
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  activeTabItem: {
+    borderTopWidth: 2,
+    borderTopColor: '#a6969f',
   },
   tabLabel: {
     fontSize: 14,
     fontWeight: '500',
+    color: '#666',
   },
-  indicator: {
-    backgroundColor: '#a6969f',
-    height: 3,
+  activeTabLabel: {
+    color: '#a6969f',
+    fontWeight: '600',
   },
 });
