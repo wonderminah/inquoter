@@ -1,10 +1,24 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, Modal, FlatList, Alert, KeyboardAvoidingView, ScrollView, TouchableWithoutFeedback, Keyboard, Animated, Dimensions } from 'react-native';
-import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useState, useRef, useEffect } from 'react';
+import { TabView, TabBar } from 'react-native-tab-view';
+import { useState, useRef } from 'react';
 import { Platform } from 'react-native';
 
-export default function App() {
+const initialLayout = { width: Dimensions.get('window').width };
+
+// 서재 화면 컴포넌트
+function LibraryScreen() {
+  return (
+    <View style={styles.screenContainer}>
+      <View style={styles.placeholderContent}>
+        <Text style={styles.placeholderText}>서재 기능은 준비 중입니다.</Text>
+      </View>
+    </View>
+  );
+}
+
+// 필사 화면 컴포넌트
+function NotesScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [selectedNoteId, setSelectedNoteId] = useState(null);
@@ -14,25 +28,8 @@ export default function App() {
   const [sentence, setSentence] = useState('');
   const [notes, setNotes] = useState([]);
   const [searchText, setSearchText] = useState('');
-  const [activeTab, setActiveTab] = useState(1); // 필사 탭을 기본으로 설정
   
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').height)).current;
-
-  const panGesture = Gesture.Pan()
-    .onEnd((event) => {
-      const { translationX } = event;
-      
-      // 스와이프 거리가 50px 이상일 때만 탭 전환
-      if (Math.abs(translationX) > 50) {
-        if (translationX > 0 && activeTab > 0) {
-          // 오른쪽으로 스와이프 (이전 탭으로) - 필사(1) → 서재(0)
-          setActiveTab(activeTab - 1);
-        } else if (translationX < 0 && activeTab < 2) {
-          // 왼쪽으로 스와이프 (다음 탭으로) - 필사(1) → 설정(2)
-          setActiveTab(activeTab + 1);
-        }
-      }
-    });
 
   const openModal = () => {
     setModalVisible(true);
@@ -115,88 +112,33 @@ export default function App() {
     </View>
   );
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 0: // 서재
-        return (
-          <View style={styles.tabContent}>
-            <View style={styles.placeholderContent}>
-              <Text style={styles.placeholderText}>서재 기능은 준비 중입니다.</Text>
-            </View>
-          </View>
-        );
-      case 1: // 필사
-        return (
-          <View style={styles.tabContent}>
-            <View style={styles.searchContainer}>
-              <TextInput
-                style={styles.searchInput}
-                placeholder="검색어를 입력하세요"
-                value={searchText}
-                onChangeText={setSearchText}
-              />
-            </View>
-            
-            <TouchableOpacity style={styles.button} onPress={openModal}>
-              <Text style={styles.buttonText}>새 필사 작성</Text>
-            </TouchableOpacity>
-            
-            <FlatList
-              data={filteredNotes}
-              renderItem={renderNote}
-              keyExtractor={item => item.id}
-              style={styles.list}
-              showsVerticalScrollIndicator={false}
-              ListEmptyComponent={
-                <Text style={styles.emptyText}>
-                  {searchText.trim() ? '검색 결과가 없습니다.' : '아직 필사가 없습니다. 새 필사를 작성해보세요!'}
-                </Text>
-              }
-            />
-          </View>
-        );
-      case 2: // 설정
-        return (
-          <View style={styles.tabContent}>
-            <View style={styles.placeholderContent}>
-              <Text style={styles.placeholderText}>설정 기능은 준비 중입니다.</Text>
-            </View>
-          </View>
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
-    <GestureHandlerRootView>
-    <View style={styles.container}>
-      <GestureDetector gesture={panGesture}>
-        <View style={styles.content}>
-          {renderTabContent()}
-        </View>
-      </GestureDetector>
-      
-      <View style={styles.tabBar}>
-        <TouchableOpacity 
-          style={[styles.tabItem, activeTab === 0 && styles.activeTabItem]} 
-          onPress={() => setActiveTab(0)}
-        >
-          <Text style={[styles.tabText, activeTab === 0 && styles.activeTabText]}>서재</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.tabItem, activeTab === 1 && styles.activeTabItem]} 
-          onPress={() => setActiveTab(1)}
-        >
-          <Text style={[styles.tabText, activeTab === 1 && styles.activeTabText]}>필사</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.tabItem, activeTab === 2 && styles.activeTabItem]} 
-          onPress={() => setActiveTab(2)}
-        >
-          <Text style={[styles.tabText, activeTab === 2 && styles.activeTabText]}>설정</Text>
-        </TouchableOpacity>
+    <View style={styles.screenContainer}>
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="검색어를 입력하세요"
+          value={searchText}
+          onChangeText={setSearchText}
+        />
       </View>
+      
+      <TouchableOpacity style={styles.button} onPress={openModal}>
+        <Text style={styles.buttonText}>새 필사 작성</Text>
+      </TouchableOpacity>
+      
+      <FlatList
+        data={filteredNotes}
+        renderItem={renderNote}
+        keyExtractor={item => item.id}
+        style={styles.list}
+        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>
+            {searchText.trim() ? '검색 결과가 없습니다.' : '아직 필사가 없습니다. 새 필사를 작성해보세요!'}
+          </Text>
+        }
+      />
       
       {modalVisible && (
         <View style={styles.overlay}>
@@ -306,10 +248,70 @@ export default function App() {
           </View>
         </View>
       </Modal>
-      
+    </View>
+  );
+}
+
+// 설정 화면 컴포넌트
+function SettingsScreen() {
+  return (
+    <View style={styles.screenContainer}>
+      <View style={styles.placeholderContent}>
+        <Text style={styles.placeholderText}>설정 기능은 준비 중입니다.</Text>
+      </View>
+    </View>
+  );
+}
+
+export default function App() {
+  const [index, setIndex] = useState(1); // 필사 탭을 기본으로 설정
+  const [routes] = useState([
+    { key: 'library', title: '서재', icon: '📚' },
+    { key: 'notes', title: '필사', icon: '✍️' },
+    { key: 'settings', title: '설정', icon: '⚙️' },
+  ]);
+
+  const renderScene = ({ route }) => {
+    switch (route.key) {
+      case 'library':
+        return <LibraryScreen />;
+      case 'notes':
+        return <NotesScreen />;
+      case 'settings':
+        return <SettingsScreen />;
+      default:
+        return null;
+    }
+  };
+
+  const renderTabBar = (props) => (
+    <TabBar
+      {...props}
+      indicatorStyle={styles.indicator}
+      style={styles.tabBar}
+      labelStyle={styles.tabLabel}
+      activeColor="#a6969f"
+      inactiveColor="#666"
+      renderLabel={({ route, focused, color }) => (
+        <Text style={[styles.tabLabel, { color }]}>
+          {route.icon} {route.title}
+        </Text>
+      )}
+    />
+  );
+
+  return (
+    <View style={styles.container}>
+      <TabView
+        navigationState={{ index, routes }}
+        renderScene={renderScene}
+        renderTabBar={renderTabBar}
+        onIndexChange={setIndex}
+        initialLayout={initialLayout}
+        swipeEnabled={true}
+      />
       <StatusBar style="auto" />
     </View>
-    </GestureHandlerRootView>
   );
 }
 
@@ -318,10 +320,34 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  content: {
+  screenContainer: {
     flex: 1,
-    paddingTop: 70,
+    backgroundColor: '#f5f5f5',
+    paddingTop: 20,
     paddingHorizontal: 20,
+  },
+  screenTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  screenDescription: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+  placeholderContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  placeholderText: {
+    fontSize: 18,
+    color: '#999',
+    textAlign: 'center',
   },
   searchContainer: {
     marginBottom: 15,
@@ -334,13 +360,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     borderWidth: 1,
     borderColor: '#ddd',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#333',
   },
   button: {
     backgroundColor: '#a6969f',
@@ -548,55 +567,18 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   tabBar: {
-    flexDirection: 'row',
     backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-    paddingBottom: 20,
-    paddingTop: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    elevation: 0,
+    shadowOpacity: 0,
   },
-  tabItem: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-  activeTabItem: {
-    borderTopWidth: 2,
-    borderTopColor: '#a6969f',
-  },
-  tabText: {
+  tabLabel: {
     fontSize: 14,
-    color: '#666',
     fontWeight: '500',
   },
-  activeTabText: {
-    color: '#a6969f',
-    fontWeight: '600',
-  },
-  tabContent: {
-    flex: 1,
-  },
-  tabTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  tabDescription: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 30,
-  },
-  placeholderContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  placeholderText: {
-    fontSize: 18,
-    color: '#999',
-    textAlign: 'center',
+  indicator: {
+    backgroundColor: '#a6969f',
+    height: 3,
   },
 });
