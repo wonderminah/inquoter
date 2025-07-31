@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, Modal, FlatList, Alert, KeyboardAvoidingView, ScrollView, TouchableWithoutFeedback, Keyboard, Animated, Dimensions } from 'react-native';
+import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useState, useRef, useEffect } from 'react';
 import { Platform } from 'react-native';
 
@@ -13,9 +14,25 @@ export default function App() {
   const [sentence, setSentence] = useState('');
   const [notes, setNotes] = useState([]);
   const [searchText, setSearchText] = useState('');
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(1); // 필사 탭을 기본으로 설정
   
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').height)).current;
+
+  const panGesture = Gesture.Pan()
+    .onEnd((event) => {
+      const { translationX } = event;
+      
+      // 스와이프 거리가 50px 이상일 때만 탭 전환
+      if (Math.abs(translationX) > 50) {
+        if (translationX > 0 && activeTab > 0) {
+          // 오른쪽으로 스와이프 (이전 탭으로) - 필사(1) → 서재(0)
+          setActiveTab(activeTab - 1);
+        } else if (translationX < 0 && activeTab < 2) {
+          // 왼쪽으로 스와이프 (다음 탭으로) - 필사(1) → 설정(2)
+          setActiveTab(activeTab + 1);
+        }
+      }
+    });
 
   const openModal = () => {
     setModalVisible(true);
@@ -98,35 +115,67 @@ export default function App() {
     </View>
   );
 
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 0: // 서재
+        return (
+          <View style={styles.tabContent}>
+            <View style={styles.placeholderContent}>
+              <Text style={styles.placeholderText}>서재 기능은 준비 중입니다.</Text>
+            </View>
+          </View>
+        );
+      case 1: // 필사
+        return (
+          <View style={styles.tabContent}>
+            <View style={styles.searchContainer}>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="검색어를 입력하세요"
+                value={searchText}
+                onChangeText={setSearchText}
+              />
+            </View>
+            
+            <TouchableOpacity style={styles.button} onPress={openModal}>
+              <Text style={styles.buttonText}>새 필사 작성</Text>
+            </TouchableOpacity>
+            
+            <FlatList
+              data={filteredNotes}
+              renderItem={renderNote}
+              keyExtractor={item => item.id}
+              style={styles.list}
+              showsVerticalScrollIndicator={false}
+              ListEmptyComponent={
+                <Text style={styles.emptyText}>
+                  {searchText.trim() ? '검색 결과가 없습니다.' : '아직 필사가 없습니다. 새 필사를 작성해보세요!'}
+                </Text>
+              }
+            />
+          </View>
+        );
+      case 2: // 설정
+        return (
+          <View style={styles.tabContent}>
+            <View style={styles.placeholderContent}>
+              <Text style={styles.placeholderText}>설정 기능은 준비 중입니다.</Text>
+            </View>
+          </View>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
+    <GestureHandlerRootView>
     <View style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="검색어를 입력하세요"
-            value={searchText}
-            onChangeText={setSearchText}
-          />
+      <GestureDetector gesture={panGesture}>
+        <View style={styles.content}>
+          {renderTabContent()}
         </View>
-        
-        <TouchableOpacity style={styles.button} onPress={openModal}>
-          <Text style={styles.buttonText}>새 필사 작성</Text>
-        </TouchableOpacity>
-        
-        <FlatList
-          data={filteredNotes}
-          renderItem={renderNote}
-          keyExtractor={item => item.id}
-          style={styles.list}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <Text style={styles.emptyText}>
-              {searchText.trim() ? '검색 결과가 없습니다.' : '아직 필사가 없습니다. 새 필사를 작성해보세요!'}
-            </Text>
-          }
-        />
-      </View>
+      </GestureDetector>
       
       <View style={styles.tabBar}>
         <TouchableOpacity 
@@ -260,6 +309,7 @@ export default function App() {
       
       <StatusBar style="auto" />
     </View>
+    </GestureHandlerRootView>
   );
 }
 
@@ -522,5 +572,31 @@ const styles = StyleSheet.create({
   activeTabText: {
     color: '#a6969f',
     fontWeight: '600',
+  },
+  tabContent: {
+    flex: 1,
+  },
+  tabTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  tabDescription: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+  placeholderContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  placeholderText: {
+    fontSize: 18,
+    color: '#999',
+    textAlign: 'center',
   },
 });
