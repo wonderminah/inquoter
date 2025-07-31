@@ -6,12 +6,14 @@ import { Platform } from 'react-native';
 
 const initialLayout = { width: Dimensions.get('window').width };
 
-// 서재 화면 컴포넌트
+// Library screen component
 function LibraryScreen() {
   return (
     <View style={styles.screenContainer}>
+      <Text style={styles.screenTitle}>Library</Text>
+      <Text style={styles.screenDescription}>Manage the books I have read.</Text>
       <View style={styles.placeholderContent}>
-        <Text style={styles.placeholderText}>서재 기능은 준비 중입니다.</Text>
+        <Text style={styles.placeholderText}>Library feature is coming soon.</Text>
       </View>
     </View>
   );
@@ -103,8 +105,8 @@ function NotesScreen() {
       <View style={styles.bookInfo}>
         <Text style={styles.bookName}>{item.bookName}</Text>
         <View style={styles.authorPageRow}>
-          <Text style={styles.author}>저자: {item.author}</Text>
-          <Text style={[styles.author, styles.page]}>페이지: {item.page}</Text>
+                  <Text style={styles.author}>Author: {item.author}</Text>
+        <Text style={[styles.author, styles.page]}>Page: {item.page}</Text>
         </View>
       </View>
       <Text style={styles.sentence}>{item.sentence}</Text>
@@ -117,14 +119,14 @@ function NotesScreen() {
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="검색어를 입력하세요"
+          placeholder="Enter search term"
           value={searchText}
           onChangeText={setSearchText}
         />
       </View>
       
       <TouchableOpacity style={styles.button} onPress={openModal}>
-        <Text style={styles.buttonText}>새 필사 작성</Text>
+        <Text style={styles.buttonText}>Write New Quote</Text>
       </TouchableOpacity>
       
       <FlatList
@@ -135,7 +137,7 @@ function NotesScreen() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <Text style={styles.emptyText}>
-            {searchText.trim() ? '검색 결과가 없습니다.' : '아직 필사가 없습니다. 새 필사를 작성해보세요!'}
+            {searchText.trim() ? 'No search results found.' : 'No quotes yet. Write your first quote!'}
           </Text>
         }
       />
@@ -162,38 +164,36 @@ function NotesScreen() {
                 contentContainerStyle={styles.scrollViewContent}
                 showsVerticalScrollIndicator={false}
               >
-                <View style={styles.modalView}>
-                  <Text style={styles.modalTitle}>새 필사 작성</Text>
-                  
-                  <Text style={styles.inputLabel}>책 이름</Text>
+                <View style={styles.modalView}>                  
+                  <Text style={styles.inputLabel}>Book Title</Text>
                   <TextInput
                     style={styles.textInput}
-                    placeholder="책 이름을 입력하세요"
+                    placeholder="Enter book title"
                     value={bookName}
                     onChangeText={setBookName}
                   />
                   
-                  <Text style={styles.inputLabel}>저자</Text>
+                  <Text style={styles.inputLabel}>Author</Text>
                   <TextInput
                     style={styles.textInput}
-                    placeholder="저자를 입력하세요"
+                    placeholder="Enter author name"
                     value={author}
                     onChangeText={setAuthor}
                   />
                   
-                  <Text style={styles.inputLabel}>페이지</Text>
+                  <Text style={styles.inputLabel}>Page</Text>
                   <TextInput
                     style={styles.textInput}
-                    placeholder="페이지를 입력하세요"
+                    placeholder="Enter page number"
                     value={page}
                     onChangeText={setPage}
                     keyboardType="numeric"
                   />
                   
-                  <Text style={styles.inputLabel}>인상깊은 문장</Text>
+                  <Text style={styles.inputLabel}>Impressive Sentence</Text>
                   <TextInput
                     style={[styles.textInput, styles.sentenceInput]}
-                    placeholder="인상깊은 문장을 입력하세요"
+                    placeholder="Enter the impressive sentence"
                     value={sentence}
                     onChangeText={setSentence}
                     multiline={true}
@@ -205,13 +205,13 @@ function NotesScreen() {
                       style={[styles.button, styles.buttonClose]}
                       onPress={closeModal}
                     >
-                      <Text style={styles.buttonText}>취소</Text>
+                      <Text style={styles.buttonText}>Cancel</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.button, styles.buttonSave]}
                       onPress={addNote}
                     >
-                      <Text style={styles.buttonText}>저장</Text>
+                      <Text style={styles.buttonText}>Save</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -229,20 +229,20 @@ function NotesScreen() {
       >
         <View style={styles.centeredView}>
           <View style={styles.deleteModalView}>
-            <Text style={styles.deleteModalTitle}>필사 삭제</Text>
-            <Text style={styles.deleteModalText}>이 필사를 삭제하시겠습니까?</Text>
+            <Text style={styles.deleteModalTitle}>Delete Quote</Text>
+            <Text style={styles.deleteModalText}>Are you sure you want to delete this quote?</Text>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={[styles.button, styles.buttonClose]}
                 onPress={() => setDeleteModalVisible(false)}
               >
-                <Text style={styles.buttonText}>취소</Text>
+                <Text style={styles.buttonText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.button, styles.buttonDelete]}
                 onPress={confirmDelete}
               >
-                <Text style={styles.buttonText}>삭제</Text>
+                <Text style={styles.buttonText}>Delete</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -256,8 +256,10 @@ function NotesScreen() {
 function SettingsScreen() {
   return (
     <View style={styles.screenContainer}>
+      <Text style={styles.screenTitle}>Settings</Text>
+      <Text style={styles.screenDescription}>Manage app settings.</Text>
       <View style={styles.placeholderContent}>
-        <Text style={styles.placeholderText}>설정 기능은 준비 중입니다.</Text>
+        <Text style={styles.placeholderText}>Settings feature is coming soon.</Text>
       </View>
     </View>
   );
@@ -266,9 +268,9 @@ function SettingsScreen() {
 export default function App() {
   const [index, setIndex] = useState(1); // 필사 탭을 기본으로 설정
   const [routes] = useState([
-    { key: 'library', title: '서재', icon: '📚' },
-    { key: 'notes', title: '필사', icon: '✍️' },
-    { key: 'settings', title: '설정', icon: '⚙️' },
+    { key: 'library', title: 'Library', icon: '📚' },
+    { key: 'notes', title: 'Quotes', icon: '✍️' },
+    { key: 'settings', title: 'Settings', icon: '⚙️' },
   ]);
 
   const renderScene = ({ route }) => {
