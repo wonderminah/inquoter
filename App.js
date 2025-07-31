@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, Modal, FlatList, Alert, KeyboardAvoidingView, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native';
-import { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, Modal, FlatList, Alert, KeyboardAvoidingView, ScrollView, TouchableWithoutFeedback, Keyboard, Animated, Dimensions } from 'react-native';
+import { useState, useRef, useEffect } from 'react';
 import { Platform } from 'react-native';
 
 export default function App() {
@@ -12,6 +12,44 @@ export default function App() {
   const [page, setPage] = useState('');
   const [sentence, setSentence] = useState('');
   const [notes, setNotes] = useState([]);
+  const [searchText, setSearchText] = useState('');
+  
+  const slideAnim = useRef(new Animated.Value(Dimensions.get('window').height)).current;
+
+  const openModal = () => {
+    setModalVisible(true);
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeModal = () => {
+    Animated.timing(slideAnim, {
+      toValue: Dimensions.get('window').height,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      setModalVisible(false);
+      setBookName('');
+      setAuthor('');
+      setPage('');
+      setSentence('');
+    });
+  };
+
+  // 검색된 필사 필터링
+  const filteredNotes = notes.filter(note => {
+    if (!searchText.trim()) return true;
+    
+    const searchLower = searchText.toLowerCase();
+    return (
+      note.bookName.toLowerCase().includes(searchLower) ||
+      note.author.toLowerCase().includes(searchLower) ||
+      note.sentence.toLowerCase().includes(searchLower)
+    );
+  });
 
   const addNote = () => {
     if (bookName.trim() && author.trim() && sentence.trim()) {
@@ -24,11 +62,7 @@ export default function App() {
         date: new Date().toLocaleString()
       };
       setNotes([newNote, ...notes]);
-      setBookName('');
-      setAuthor('');
-      setPage('');
-      setSentence('');
-      setModalVisible(false);
+      closeModal();
     }
   };
 
@@ -53,8 +87,10 @@ export default function App() {
       </TouchableOpacity>
       <View style={styles.bookInfo}>
         <Text style={styles.bookName}>{item.bookName}</Text>
-        <Text style={styles.author}>저자: {item.author}</Text>
-        <Text style={styles.page}>페이지: {item.page}</Text>
+        <View style={styles.authorPageRow}>
+          <Text style={styles.author}>저자: {item.author}</Text>
+          <Text style={[styles.author, styles.page]}>페이지: {item.page}</Text>
+        </View>
       </View>
       <Text style={styles.sentence}>{item.sentence}</Text>
       <Text style={styles.noteDate}>{item.date}</Text>
@@ -63,29 +99,46 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="검색어를 입력하세요"
+          value={searchText}
+          onChangeText={setSearchText}
+        />
+      </View>
+      
+      <TouchableOpacity style={styles.button} onPress={openModal}>
         <Text style={styles.buttonText}>새 필사 작성</Text>
       </TouchableOpacity>
       
       <FlatList
-        data={notes}
+        data={filteredNotes}
         renderItem={renderNote}
         keyExtractor={item => item.id}
         style={styles.list}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>아직 필사가 없습니다. 새 필사를 작성해보세요!</Text>
+          <Text style={styles.emptyText}>
+            {searchText.trim() ? '검색 결과가 없습니다.' : '아직 필사가 없습니다. 새 필사를 작성해보세요!'}
+          </Text>
         }
       />
       
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.centeredView}>
+      {modalVisible && (
+        <View style={styles.overlay}>
+          <TouchableWithoutFeedback onPress={closeModal}>
+            <View style={styles.overlayBackground} />
+          </TouchableWithoutFeedback>
+          <Animated.View 
+            style={[
+              styles.slideView,
+              {
+                transform: [{ translateY: slideAnim }]
+              }
+            ]}
+          >
+            <View style={styles.slideHandle} />
             <KeyboardAvoidingView 
               behavior={Platform.OS === "ios" ? "padding" : "height"}
               style={styles.keyboardAvoidingView}
@@ -135,13 +188,7 @@ export default function App() {
                   <View style={styles.buttonContainer}>
                     <TouchableOpacity
                       style={[styles.button, styles.buttonClose]}
-                      onPress={() => {
-                        setBookName('');
-                        setAuthor('');
-                        setPage('');
-                        setSentence('');
-                        setModalVisible(false);
-                      }}
+                      onPress={closeModal}
                     >
                       <Text style={styles.buttonText}>취소</Text>
                     </TouchableOpacity>
@@ -155,9 +202,9 @@ export default function App() {
                 </View>
               </ScrollView>
             </KeyboardAvoidingView>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+          </Animated.View>
+        </View>
+      )}
 
       <Modal
         animationType="fade"
@@ -198,6 +245,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     paddingTop: 70,
     paddingHorizontal: 20,
+  },
+  searchContainer: {
+    marginBottom: 15,
+  },
+  searchInput: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    borderRadius: 8,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   title: {
     fontSize: 24,
@@ -257,9 +316,14 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 4,
   },
+  authorPageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   author: {
     fontSize: 14,
     color: '#666',
+    marginRight: 10,
   },
   sentence: {
     fontSize: 16,
@@ -299,19 +363,10 @@ const styles = StyleSheet.create({
   modalView: {
     margin: 20,
     backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
+    padding: 20,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
     elevation: 5,
     width: '90%',
-    maxHeight: '80%',
   },
   deleteModalView: {
     margin: 20,
@@ -382,5 +437,37 @@ const styles = StyleSheet.create({
   buttonDelete: {
     backgroundColor: '#8E8E93',
     flex: 0.45,
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1000,
+  },
+  overlayBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  slideView: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '90%',
+    minHeight: '50%',
+  },
+  slideHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: '#ddd',
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginTop: 10,
+    marginBottom: 10,
   },
 });
