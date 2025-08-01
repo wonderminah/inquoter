@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
+import * as Font from 'expo-font';
 
 const initialLayout = { width: Dimensions.get('window').width };
 
@@ -172,7 +173,7 @@ function QuotesScreen() {
       </View>
       <View style={styles.cardAuthorInfo}>
         <Text style={styles.cardAuthor}>{item.author}</Text>
-        <Text style={styles.cardPage}>Page: {item.page}</Text>
+        <Text style={styles.cardPage}>페이지: {item.page}</Text>
       </View>
       <Text style={styles.cardSentence}>{item.sentence}</Text>
       <Text style={styles.cardDate}>{item.date}</Text>
@@ -513,12 +514,24 @@ function SettingsScreen() {
 }
 
 export default function App() {
+  const [fontsLoaded, setFontsLoaded] = useState(false);
   const [index, setIndex] = useState(1); // 필사 탭을 기본으로 설정
   const [routes] = useState([
     { key: 'library', title: '서재', icon: '' },
     { key: 'quotes', title: '인용구', icon: '' },
     { key: 'settings', title: '설정', icon: '' },
   ]);
+
+  // 폰트 로딩
+  useEffect(() => {
+    async function loadFonts() {
+      await Font.loadAsync({
+        'NanumMyeongjo': require('./assets/font/NanumMyeongjo-Regular.ttf'),
+      });
+      setFontsLoaded(true);
+    }
+    loadFonts();
+  }, []);
 
   const renderScene = ({ route }) => {
     switch (route.key) {
@@ -534,6 +547,14 @@ export default function App() {
   };
 
 
+
+  if (!fontsLoaded) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>로딩 중...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -566,6 +587,16 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  loadingText: {
+    fontSize: 18,
+    color: '#666',
+  },
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
@@ -835,8 +866,10 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 10,
     lineHeight: 22,
-    fontStyle: 'italic',
+    // fontStyle: 'italic',
     marginRight: 30,
+    fontFamily: 'NanumMyeongjo',
+    transform: [{ skewX: '-10deg' }],
   },
   listDate: {
     fontSize: 12,
@@ -901,7 +934,9 @@ const styles = StyleSheet.create({
     color: '#333',
     lineHeight: 20,
     marginBottom: 8,
-    fontStyle: 'italic',
+    // fontStyle: 'italic',
+    fontFamily: 'NanumMyeongjo',
+    transform: [{ skewX: '-10deg' }],
   },
   cardDate: {
     fontSize: 10,
