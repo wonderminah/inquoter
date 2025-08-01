@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, Modal, FlatList, Alert, KeyboardAvoidingView, ScrollView, TouchableWithoutFeedback, Keyboard, Animated, Dimensions, Image, Switch } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, Modal, FlatList, Alert, KeyboardAvoidingView, ScrollView, TouchableWithoutFeedback, Keyboard, Animated, Dimensions, Image, Switch, ActionSheetIOS } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { TabView, TabBar } from 'react-native-tab-view';
 import { useState, useRef, useEffect } from 'react';
 import { Platform } from 'react-native';
@@ -133,10 +134,40 @@ function QuotesScreen() {
     setSelectedQuoteId(null);
   };
 
+  const showActionSheet = (quote) => {
+    if (Platform.OS === 'ios') {
+      // 햅틱 피드백 추가
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+
+      // 액션 시트 표시
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['편집', '삭제', '취소'],
+          cancelButtonIndex: 2,
+          destructiveButtonIndex: 1,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 0) {
+            console.log('편집 선택됨');
+            // 편집 선택 시 햅틱 피드백
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          } else if (buttonIndex === 1) {
+            console.log('삭제 선택됨');
+            // 삭제 선택 시 햅틱 피드백
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+          }
+        }
+      );
+    } else {
+      // Alert.alert('편집');
+      // iOS 이외의 플랫폼에는 일단 대응하지 않음
+    }
+  };
+
   const renderList = ({ item }) => (
     <TouchableOpacity 
       style={styles.listItem}
-      onLongPress={() => console.debug('길게 누르기')}
+      onLongPress={() => showActionSheet(item)}
       delayLongPress={500}
     >
       <TouchableOpacity 
@@ -163,7 +194,7 @@ function QuotesScreen() {
   const renderCard = ({ item }) => (
     <TouchableOpacity 
       style={styles.cardItem}
-      onLongPress={() => console.debug('길게 누르기')}
+      onLongPress={() => showActionSheet(item)}
       delayLongPress={500}
     >
       <View style={styles.cardHeader}>
