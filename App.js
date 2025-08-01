@@ -71,25 +71,14 @@ function QuotesScreen() {
 
   const openModal = () => {
     setModalVisible(true);
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
   };
 
   const closeModal = () => {
-    Animated.timing(slideAnim, {
-      toValue: -Dimensions.get('window').height,
-      duration: 300,
-      useNativeDriver: true,
-    }).start(() => {
-      setModalVisible(false);
-      setBookName('');
-      setAuthor('');
-      setPage('');
-      setSentence('');
-    });
+    setModalVisible(false);
+    setBookName('');
+    setAuthor('');
+    setPage('');
+    setSentence('');
   };
 
   // 검색된 필사 필터링
@@ -255,20 +244,18 @@ function QuotesScreen() {
       />
       
       {modalVisible && (
-        <View style={styles.overlay}>
-          <TouchableWithoutFeedback onPress={closeModal}>
-            <View style={styles.overlayBackground} />
-          </TouchableWithoutFeedback>
-          <Animated.View 
-            style={[
-              styles.slideView,
-              {
-                transform: [{ translateY: slideAnim }]
-              }
-            ]}
-          >
+        <Modal
+          animationType="fade"
+          transparent={false}
+          visible={modalVisible}
+          onRequestClose={closeModal}
+        >
+          <View style={styles.fullScreenModal}>
             <View style={styles.modalHeader}>
-              <View style={styles.slideHandle} />
+              <View style={styles.headerLeft} />
+              <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
             </View>
             <KeyboardAvoidingView 
               behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -331,8 +318,8 @@ function QuotesScreen() {
                 </View>
               </ScrollView>
             </KeyboardAvoidingView>
-          </Animated.View>
-        </View>
+          </View>
+        </Modal>
       )}
 
       <Modal
@@ -1100,28 +1087,32 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  slideView: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+  fullScreenModal: {
+    flex: 1,
     backgroundColor: 'white',
   },
   modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingTop: 50,
+    paddingHorizontal: 20,
     paddingBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
     backgroundColor: '#fff',
   },
-  slideHandle: {
+  headerLeft: {
+    flex: 1,
+  },
+  closeButton: {
     width: 40,
-    height: 4,
-    backgroundColor: '#ddd',
-    borderRadius: 2,
-    alignSelf: 'center',
-    marginBottom: 15,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 24,
+    color: '#999',
+    fontWeight: '300',
   },
   contentContainer: {
     flex: 1,
