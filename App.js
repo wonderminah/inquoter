@@ -104,18 +104,22 @@ function NotesScreen() {
   });
 
   const addNote = () => {
-    if (bookName.trim() && author.trim() && sentence.trim()) {
-      const newNote = {
-        id: Date.now().toString(),
-        bookName: bookName,
-        author: author,
-        page: page,
-        sentence: sentence,
-        date: new Date().toLocaleString()
-      };
-      setNotes([newNote, ...notes]);
-      closeModal();
+    if (!sentence.trim()) {
+      Alert.alert('입력 오류', '인상깊은 문장을 입력해주세요.');
+      return;
     }
+    
+    const newNote = {
+      id: Date.now().toString(),
+      bookName: bookName.trim() || '제목 없음',
+      author: author.trim() || '저자 없음',
+      page: page.trim() || '',
+      sentence: sentence.trim(),
+      date: new Date().toLocaleString()
+    };
+    const updatedNotes = [newNote, ...notes];
+    setNotes(updatedNotes);
+    closeModal();
   };
 
   const deleteNote = (id) => {
