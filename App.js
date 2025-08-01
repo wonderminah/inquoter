@@ -252,72 +252,50 @@ function QuotesScreen() {
         >
           <View style={styles.fullScreenModal}>
             <View style={styles.modalHeader}>
-              <View style={styles.headerLeft} />
               <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
                 <Text style={styles.closeButtonText}>✕</Text>
               </TouchableOpacity>
+              <TouchableOpacity style={styles.saveButton} onPress={addQuote}>
+                <Text style={styles.saveButtonText}>작성</Text>
+              </TouchableOpacity>
             </View>
-            <KeyboardAvoidingView 
-              behavior={Platform.OS === "ios" ? "padding" : "height"}
-              style={styles.keyboardAvoidingView}
-            >
-              <ScrollView 
-                contentContainerStyle={styles.scrollViewContent}
-                showsVerticalScrollIndicator={false}
-              >
-                <View style={styles.modalView}>                  
-                  <Text style={styles.inputLabel}>책 제목</Text>
-                  <TextInput
-                    style={styles.textInput}
-                    placeholder="책 제목을 입력하세요"
-                    value={bookName}
-                    onChangeText={setBookName}
-                  />
-                  
-                  <Text style={styles.inputLabel}>저자</Text>
-                  <TextInput
-                    style={styles.textInput}
-                    placeholder="저자명을 입력하세요"
-                    value={author}
-                    onChangeText={setAuthor}
-                  />
-                  
-                  <Text style={styles.inputLabel}>페이지</Text>
-                  <TextInput
-                    style={styles.textInput}
-                    placeholder="페이지 번호를 입력하세요"
-                    value={page}
-                    onChangeText={setPage}
-                    keyboardType="numeric"
-                  />
-                  
-                  <Text style={styles.inputLabel}>인상깊은 문장</Text>
-                  <TextInput
-                    style={[styles.textInput, styles.sentenceInput]}
-                    placeholder="인상깊은 문장을 입력하세요"
-                    value={sentence}
-                    onChangeText={setSentence}
-                    multiline={true}
-                    numberOfLines={4}
-                  />
-                  
-                  <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                      style={[styles.button, styles.buttonClose]}
-                      onPress={closeModal}
-                    >
-                      <Text style={styles.buttonText}>취소</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.button, styles.buttonSave]}
-                      onPress={addQuote}
-                    >
-                      <Text style={styles.buttonText}>저장</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </ScrollView>
-            </KeyboardAvoidingView>
+            <View style={styles.modalView}>
+              <Text style={styles.inputLabel}>책 제목</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="책 제목을 입력하세요"
+                value={bookName}
+                onChangeText={setBookName}
+                autoFocus={true}
+              />
+              
+              <Text style={styles.inputLabel}>저자</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="저자명을 입력하세요"
+                value={author}
+                onChangeText={setAuthor}
+              />
+              
+              <Text style={styles.inputLabel}>페이지</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="페이지 번호를 입력하세요"
+                value={page}
+                onChangeText={setPage}
+                keyboardType="numeric"
+              />
+              
+              <Text style={styles.inputLabel}>인상깊은 문장</Text>
+              <TextInput
+                style={[styles.textInput, styles.sentenceInput]}
+                placeholder="인상깊은 문장을 입력하세요"
+                value={sentence}
+                onChangeText={setSentence}
+                multiline={true}
+                numberOfLines={4}
+              />
+            </View>
           </View>
         </Modal>
       )}
@@ -996,9 +974,10 @@ const styles = StyleSheet.create({
   modalView: {
     flex: 1,
     backgroundColor: 'white',
-    padding: 20,
+    paddingHorizontal: 20,
     alignItems: 'center',
-    width: '95%',
+    // width: '100%',
+    
   },
   deleteModalView: {
     margin: 20,
@@ -1041,8 +1020,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   textInput: {
-    borderWidth: 1,
-    borderColor: '#f8f8f8',
+    // borderWidth: 1,
+    // borderColor: '#f8f8f8',
     borderRadius: 8,
     padding: 12,
     width: '100%',
@@ -1054,7 +1033,7 @@ const styles = StyleSheet.create({
   },
   sentenceInput: {
     minHeight: 100,
-    height: 100,
+    height: 170,
     textAlignVertical: 'top',
     backgroundColor: '#f8f8f8',
   },
@@ -1097,22 +1076,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 50,
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    // paddingBottom: 20,
     backgroundColor: '#fff',
-  },
-  headerLeft: {
-    flex: 1,
+    // marginHorizontal: 20,
   },
   closeButton: {
     width: 40,
     height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
   closeButtonText: {
     fontSize: 24,
     color: '#999',
     fontWeight: '300',
+  },
+  saveButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#a6969f',
+    borderRadius: 8,
+  },
+  saveButtonText: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: '600',
   },
   contentContainer: {
     flex: 1,
