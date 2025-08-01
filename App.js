@@ -22,7 +22,7 @@ function LibraryScreen() {
   return (
     <View style={styles.screenContainer}>
       <View style={styles.placeholderContent}>
-        <Text style={styles.placeholderText}>Library feature is coming soon.</Text>
+        <Text style={styles.placeholderText}>서재 기능이 곧 출시됩니다.</Text>
       </View>
     </View>
   );
@@ -180,7 +180,7 @@ function NotesScreen() {
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Enter search term"
+          placeholder="검색어를 입력하세요"
           value={searchText}
           onChangeText={setSearchText}
         />
@@ -188,7 +188,7 @@ function NotesScreen() {
       
       <View style={styles.buttonRow}>
         <TouchableOpacity style={styles.button} onPress={openModal}>
-          <Text style={styles.buttonText}>Write New Quote</Text>
+          <Text style={styles.buttonText}>새 인용구 작성</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.viewToggleButton} onPress={() => setViewMode(viewMode === 'list' ? 'card' : 'list')}>
           <Text style={styles.viewToggleText}>{viewMode === 'list' ? '📋' : '📄'}</Text>
@@ -206,7 +206,7 @@ function NotesScreen() {
         columnWrapperStyle={viewMode === 'card' ? styles.cardRow : null}
         ListEmptyComponent={
           <Text style={styles.emptyText}>
-            {searchText.trim() ? 'No search results found.' : 'No quotes yet. Write your first quote!'}
+            {searchText.trim() ? '검색 결과가 없습니다.' : '아직 인용구가 없습니다. 첫 번째 인용구를 작성해보세요!'}
           </Text>
         }
       />
@@ -236,35 +236,35 @@ function NotesScreen() {
                 showsVerticalScrollIndicator={false}
               >
                 <View style={styles.modalView}>                  
-                  <Text style={styles.inputLabel}>Book Title</Text>
+                  <Text style={styles.inputLabel}>책 제목</Text>
                   <TextInput
                     style={styles.textInput}
-                    placeholder="Enter book title"
+                    placeholder="책 제목을 입력하세요"
                     value={bookName}
                     onChangeText={setBookName}
                   />
                   
-                  <Text style={styles.inputLabel}>Author</Text>
+                  <Text style={styles.inputLabel}>저자</Text>
                   <TextInput
                     style={styles.textInput}
-                    placeholder="Enter author name"
+                    placeholder="저자명을 입력하세요"
                     value={author}
                     onChangeText={setAuthor}
                   />
                   
-                  <Text style={styles.inputLabel}>Page</Text>
+                  <Text style={styles.inputLabel}>페이지</Text>
                   <TextInput
                     style={styles.textInput}
-                    placeholder="Enter page number"
+                    placeholder="페이지 번호를 입력하세요"
                     value={page}
                     onChangeText={setPage}
                     keyboardType="numeric"
                   />
                   
-                  <Text style={styles.inputLabel}>Impressive Sentence</Text>
+                  <Text style={styles.inputLabel}>인상깊은 문장</Text>
                   <TextInput
                     style={[styles.textInput, styles.sentenceInput]}
-                    placeholder="Enter the impressive sentence"
+                    placeholder="인상깊은 문장을 입력하세요"
                     value={sentence}
                     onChangeText={setSentence}
                     multiline={true}
@@ -276,13 +276,13 @@ function NotesScreen() {
                       style={[styles.button, styles.buttonClose]}
                       onPress={closeModal}
                     >
-                      <Text style={styles.buttonText}>Cancel</Text>
+                      <Text style={styles.buttonText}>취소</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.button, styles.buttonSave]}
                       onPress={addNote}
                     >
-                      <Text style={styles.buttonText}>Save</Text>
+                      <Text style={styles.buttonText}>저장</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -300,20 +300,20 @@ function NotesScreen() {
       >
         <View style={styles.centeredView}>
           <View style={styles.deleteModalView}>
-            <Text style={styles.deleteModalTitle}>Delete Quote</Text>
-            <Text style={styles.deleteModalText}>Are you sure you want to delete this quote?</Text>
+            <Text style={styles.deleteModalTitle}>인용구 삭제</Text>
+            <Text style={styles.deleteModalText}>이 인용구를 삭제하시겠습니까?</Text>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={[styles.button, styles.buttonClose]}
                 onPress={() => setDeleteModalVisible(false)}
               >
-                <Text style={styles.buttonText}>Cancel</Text>
+                <Text style={styles.buttonText}>취소</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.button, styles.buttonDelete]}
                 onPress={confirmDelete}
               >
-                <Text style={styles.buttonText}>Delete</Text>
+                <Text style={styles.buttonText}>삭제</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -500,8 +500,8 @@ function SettingsScreen() {
         </Modal>
         
         <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>앱 정보</Text>
-          <Text style={styles.settingDescription}>Inquoter v1.0.0</Text>
+          <Text style={styles.settingLabel}>앱 버전</Text>
+          <Text style={styles.settingDescription}>1.0.0</Text>
         </View>
       </View>
     </View>
@@ -511,9 +511,9 @@ function SettingsScreen() {
 export default function App() {
   const [index, setIndex] = useState(1); // 필사 탭을 기본으로 설정
   const [routes] = useState([
-    { key: 'library', title: 'Library', icon: '' },
-    { key: 'notes', title: 'Quotes', icon: '' },
-    { key: 'settings', title: 'Settings', icon: '' },
+    { key: 'library', title: '서재', icon: '' },
+    { key: 'notes', title: '인용구', icon: '' },
+    { key: 'settings', title: '설정', icon: '' },
   ]);
 
   const renderScene = ({ route }) => {
