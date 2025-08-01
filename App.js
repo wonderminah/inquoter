@@ -134,7 +134,11 @@ function QuotesScreen() {
   };
 
   const renderList = ({ item }) => (
-    <View style={styles.listItem}>
+    <TouchableOpacity 
+      style={styles.listItem}
+      onLongPress={() => console.debug('길게 누르기')}
+      delayLongPress={500}
+    >
       <TouchableOpacity 
         style={styles.deleteButton}
         onPress={() => deleteQuote(item.id)}
@@ -153,11 +157,15 @@ function QuotesScreen() {
       </View>
       <Text style={styles.listSentence}>{item.sentence}</Text>
       <Text style={styles.listDate}>{item.date}</Text>
-    </View>
+    </TouchableOpacity>
   );
 
   const renderCard = ({ item }) => (
-    <View style={styles.cardItem}>
+    <TouchableOpacity 
+      style={styles.cardItem}
+      onLongPress={() => console.debug('길게 누르기')}
+      delayLongPress={500}
+    >
       <View style={styles.cardHeader}>
         <Text style={styles.cardBookName}>{item.bookName}</Text>
         <TouchableOpacity 
@@ -176,7 +184,7 @@ function QuotesScreen() {
       </View>
       <Text style={styles.cardSentence}>{item.sentence}</Text>
       <Text style={styles.cardDate}>{item.date}</Text>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
