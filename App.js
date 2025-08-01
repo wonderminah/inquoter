@@ -41,7 +41,6 @@ function QuotesScreen() {
   const [quotes, setQuotes] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'card'
-  
   const slideAnim = useRef(new Animated.Value(-Dimensions.get('window').height)).current;
 
   // 랜덤 인용구 선택 함수
@@ -205,7 +204,7 @@ function QuotesScreen() {
         data={filteredQuotes}
         renderItem={viewMode === 'list' ? renderList : renderCard}
         keyExtractor={item => item.id}
-        style={styles.list}
+        style={styles.flatList}
         showsVerticalScrollIndicator={false}
         numColumns={viewMode === 'card' ? 2 : 1}
         columnWrapperStyle={viewMode === 'card' ? styles.cardRow : null}
@@ -812,7 +811,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
-  list: {
+  flatList: {
     flex: 1,
   },
   listItem: {
@@ -866,10 +865,11 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 10,
     lineHeight: 22,
-    // fontStyle: 'italic',
     marginRight: 30,
     fontFamily: 'NanumMyeongjo',
-    transform: [{ skewX: '-10deg' }],
+    borderLeftWidth: 4,
+    borderLeftColor: '#ccc',
+    paddingLeft: 12,
   },
   listDate: {
     fontSize: 12,
@@ -934,9 +934,10 @@ const styles = StyleSheet.create({
     color: '#333',
     lineHeight: 20,
     marginBottom: 8,
-    // fontStyle: 'italic',
     fontFamily: 'NanumMyeongjo',
-    transform: [{ skewX: '-10deg' }],
+    borderLeftWidth: 3,
+    borderLeftColor: '#ccc',
+    paddingLeft: 10,
   },
   cardDate: {
     fontSize: 10,
