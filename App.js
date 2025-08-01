@@ -29,15 +29,15 @@ function LibraryScreen() {
 }
 
 // 필사 화면 컴포넌트
-function NotesScreen() {
+function QuotesScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [selectedNoteId, setSelectedNoteId] = useState(null);
+  const [selectedQuoteId, setSelectedQuoteId] = useState(null);
   const [bookName, setBookName] = useState('');
   const [author, setAuthor] = useState('');
   const [page, setPage] = useState('');
   const [sentence, setSentence] = useState('');
-  const [notes, setNotes] = useState([]);
+  const [quotes, setQuotes] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'card'
   
@@ -45,9 +45,9 @@ function NotesScreen() {
 
   // 랜덤 인용구 선택 함수
   const getRandomQuote = () => {
-    if (notes.length === 0) return null;
-    const randomIndex = Math.floor(Math.random() * notes.length);
-    return notes[randomIndex];
+    if (quotes.length === 0) return null;
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    return quotes[randomIndex];
   };
 
   // 랜덤 인용구 푸시 알림
@@ -92,24 +92,24 @@ function NotesScreen() {
   };
 
   // 검색된 필사 필터링
-  const filteredNotes = notes.filter(note => {
+  const filteredQuotes = quotes.filter(quote => {
     if (!searchText.trim()) return true;
     
     const searchLower = searchText.toLowerCase();
     return (
-      note.bookName.toLowerCase().includes(searchLower) ||
-      note.author.toLowerCase().includes(searchLower) ||
-      note.sentence.toLowerCase().includes(searchLower)
+      quote.bookName.toLowerCase().includes(searchLower) ||
+      quote.author.toLowerCase().includes(searchLower) ||
+      quote.sentence.toLowerCase().includes(searchLower)
     );
   });
 
-  const addNote = () => {
+  const addQuote = () => {
     if (!sentence.trim()) {
       Alert.alert('입력 오류', '인상깊은 문장을 입력해주세요.');
       return;
     }
     
-    const newNote = {
+    const newQuote = {
       id: Date.now().toString(),
       bookName: bookName.trim() || '제목 없음',
       author: author.trim() || '저자 없음',
@@ -117,42 +117,42 @@ function NotesScreen() {
       sentence: sentence.trim(),
       date: new Date().toLocaleString()
     };
-    const updatedNotes = [newNote, ...notes];
-    setNotes(updatedNotes);
+    const updatedQuotes = [newQuote, ...quotes];
+    setQuotes(updatedQuotes);
     closeModal();
   };
 
-  const deleteNote = (id) => {
-    setSelectedNoteId(id);
+  const deleteQuote = (id) => {
+    setSelectedQuoteId(id);
     setDeleteModalVisible(true);
   };
 
   const confirmDelete = () => {
-    setNotes(notes.filter(note => note.id !== selectedNoteId));
+    setQuotes(quotes.filter(quote => quote.id !== selectedQuoteId));
     setDeleteModalVisible(false);
-    setSelectedNoteId(null);
+    setSelectedQuoteId(null);
   };
 
-  const renderNote = ({ item }) => (
-    <View style={styles.noteItem}>
+  const renderList = ({ item }) => (
+    <View style={styles.listItem}>
       <TouchableOpacity 
         style={styles.deleteButton}
-        onPress={() => deleteNote(item.id)}
+        onPress={() => deleteQuote(item.id)}
       >
         <Image 
           source={require('./assets/free-icon-recycle-bin.png')}
           style={styles.deleteButtonImage}
         />
       </TouchableOpacity>
-      <View style={styles.bookInfo}>
-        <Text style={styles.bookName}>{item.bookName}</Text>
-        <View style={styles.authorPageRow}>
-                  <Text style={styles.author}>Author: {item.author}</Text>
-        <Text style={[styles.author, styles.page]}>Page: {item.page}</Text>
+      <View style={styles.listBookInfo}>
+        <Text style={styles.listBookName}>{item.bookName}</Text>
+        <View style={styles.listAuthorPageRow}>
+                  <Text style={styles.listAuthor}>저자: {item.author}</Text>
+        <Text style={[styles.listAuthor, styles.listPage]}>페이지: {item.page}</Text>
         </View>
       </View>
-      <Text style={styles.sentence}>{item.sentence}</Text>
-      <Text style={styles.noteDate}>{item.date}</Text>
+      <Text style={styles.listSentence}>{item.sentence}</Text>
+      <Text style={styles.listDate}>{item.date}</Text>
     </View>
   );
 
@@ -162,7 +162,7 @@ function NotesScreen() {
         <Text style={styles.cardBookName}>{item.bookName}</Text>
         <TouchableOpacity 
           style={styles.cardDeleteButton}
-          onPress={() => deleteNote(item.id)}
+          onPress={() => deleteQuote(item.id)}
         >
           <Image 
             source={require('./assets/free-icon-recycle-bin.png')}
@@ -201,8 +201,8 @@ function NotesScreen() {
       
       <FlatList
         key={viewMode}
-        data={filteredNotes}
-        renderItem={viewMode === 'list' ? renderNote : renderCard}
+        data={filteredQuotes}
+        renderItem={viewMode === 'list' ? renderList : renderCard}
         keyExtractor={item => item.id}
         style={styles.list}
         showsVerticalScrollIndicator={false}
@@ -284,7 +284,7 @@ function NotesScreen() {
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.button, styles.buttonSave]}
-                      onPress={addNote}
+                      onPress={addQuote}
                     >
                       <Text style={styles.buttonText}>저장</Text>
                     </TouchableOpacity>
@@ -516,7 +516,7 @@ export default function App() {
   const [index, setIndex] = useState(1); // 필사 탭을 기본으로 설정
   const [routes] = useState([
     { key: 'library', title: '서재', icon: '' },
-    { key: 'notes', title: '인용구', icon: '' },
+    { key: 'quotes', title: '인용구', icon: '' },
     { key: 'settings', title: '설정', icon: '' },
   ]);
 
@@ -524,8 +524,8 @@ export default function App() {
     switch (route.key) {
       case 'library':
         return <LibraryScreen />;
-      case 'notes':
-        return <NotesScreen />;
+      case 'quotes':
+        return <QuotesScreen />;
       case 'settings':
         return <SettingsScreen />;
       default:
@@ -784,7 +784,7 @@ const styles = StyleSheet.create({
   list: {
     flex: 1,
   },
-  noteItem: {
+  listItem: {
     backgroundColor: '#fff',
     padding: 15,
     borderRadius: 10,
@@ -811,26 +811,26 @@ const styles = StyleSheet.create({
     height: 20,
     tintColor: '#FF3B30',
   },
-  bookInfo: {
+  listBookInfo: {
     marginBottom: 10,
     marginRight: 30,
   },
-  bookName: {
+  listBookName: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 4,
   },
-  authorPageRow: {
+  listAuthorPageRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  author: {
+  listAuthor: {
     fontSize: 14,
     color: '#666',
     marginRight: 10,
   },
-  sentence: {
+  listSentence: {
     fontSize: 16,
     color: '#333',
     marginBottom: 10,
@@ -838,7 +838,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginRight: 30,
   },
-  noteDate: {
+  listDate: {
     fontSize: 12,
     color: '#999',
     textAlign: 'right',
@@ -901,6 +901,7 @@ const styles = StyleSheet.create({
     color: '#333',
     lineHeight: 20,
     marginBottom: 8,
+    fontStyle: 'italic',
   },
   cardDate: {
     fontSize: 10,
