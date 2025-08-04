@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, Modal, FlatList, Alert, KeyboardAvoidingView, ScrollView, TouchableWithoutFeedback, Keyboard, Animated, Dimensions, Image, Switch, ActionSheetIOS } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TabView, TabBar } from 'react-native-tab-view';
 import { useState, useRef, useEffect } from 'react';
 import { Platform } from 'react-native';
@@ -43,6 +44,32 @@ function QuotesScreen() {
   const [searchText, setSearchText] = useState('');
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'card'
   const slideAnim = useRef(new Animated.Value(-Dimensions.get('window').height)).current;
+
+  // 저장된 인용구 불러오기
+  useEffect(() => {
+    loadQuotes();
+  }, []);
+
+  const loadQuotes = async () => {
+    try {
+      const savedQuotes = await AsyncStorage.getItem('quotes');
+      if (savedQuotes) {
+        setQuotes(JSON.parse(savedQuotes));
+        console.log('Loaded quotes:', JSON.parse(savedQuotes).length);
+      }
+    } catch (error) {
+      console.error('Error loading quotes:', error);
+    }
+  };
+
+  const saveQuotes = async (newQuotes) => {
+    try {
+      await AsyncStorage.setItem('quotes', JSON.stringify(newQuotes));
+      console.log('Saved quotes:', newQuotes.length);
+    } catch (error) {
+      console.error('Error saving quotes:', error);
+    }
+  };
 
   // 랜덤 인용구 선택 함수
   const getRandomQuote = () => {
@@ -93,22 +120,32 @@ function QuotesScreen() {
     );
   });
 
-  const addQuote = () => {
+  const addQuote = async () => {
+    console.log('addQuote called');
+    console.log('sentence:', sentence);
+    console.log('bookName:', bookName);
+    console.log('author:', author);
+    console.log('page:', page);
+    
     if (!sentence.trim()) {
-      Alert.alert('입력 오류', '인상깊은 문장을 입력해주세요.');
+      Alert.alert('Input Error', 'Please enter a quote.');
       return;
     }
     
     const newQuote = {
       id: Date.now().toString(),
-      bookName: bookName.trim() || '제목 없음',
-      author: author.trim() || '저자 없음',
+      bookName: bookName.trim() || 'No Title',
+      author: author.trim() || 'No Author',
       page: page.trim() || '',
       sentence: sentence.trim(),
       date: new Date().toLocaleString()
     };
+    
+    console.log('newQuote:', newQuote);
     const updatedQuotes = [newQuote, ...quotes];
     setQuotes(updatedQuotes);
+    await saveQuotes(updatedQuotes);
+    console.log('quotes updated and saved, count:', updatedQuotes.length);
     closeModal();
   };
 
@@ -117,8 +154,10 @@ function QuotesScreen() {
     setDeleteModalVisible(true);
   };
 
-  const confirmDelete = () => {
-    setQuotes(quotes.filter(quote => quote.id !== selectedQuoteId));
+  const confirmDelete = async () => {
+    const updatedQuotes = quotes.filter(quote => quote.id !== selectedQuoteId);
+    setQuotes(updatedQuotes);
+    await saveQuotes(updatedQuotes);
     setDeleteModalVisible(false);
     setSelectedQuoteId(null);
   };
@@ -131,7 +170,7 @@ function QuotesScreen() {
       // 액션 시트 표시
       ActionSheetIOS.showActionSheetWithOptions(
         {
-          options: ['편집', '삭제', '취소'],
+          options: ['Edit', 'Delete', 'Cancel'],
           cancelButtonIndex: 2,
           destructiveButtonIndex: 1,
         },
@@ -222,9 +261,10 @@ function QuotesScreen() {
         <TouchableOpacity style={styles.button} onPress={openModal}>
           <Text style={styles.buttonText}>Write New Quote</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.viewToggleButton} onPress={() => setViewMode(viewMode === 'list' ? 'card' : 'list')}>
+        {/* TODO: 표시 모드 추가 */}
+        {/* <TouchableOpacity style={styles.viewToggleButton} onPress={() => setViewMode(viewMode === 'list' ? 'card' : 'list')}>
           <Text style={styles.viewToggleText}>{viewMode === 'list' ? '📋' : '📄'}</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       
       <FlatList
@@ -401,7 +441,8 @@ function SettingsScreen() {
   return (
     <View style={styles.screenContainer}>
       <View style={styles.settingsContainer}>
-        <View style={styles.settingItem}>
+        {/* TODO: 알림 기능 추가 */}
+        {/* <View style={styles.settingItem}>
           <Text style={styles.settingLabel}>Daily Quote Notifications</Text>
           <Switch
             value={notificationEnabled}
@@ -409,9 +450,10 @@ function SettingsScreen() {
             trackColor={{ false: '#767577', true: '#a6969f' }}
             thumbColor={notificationEnabled ? '#f4f3f4' : '#f4f3f4'}
           />
-        </View>
+        </View> */}
         
-        {notificationEnabled && (
+        {/* TODO: 알림 기능 추가 */}
+        {/* {notificationEnabled && (
           <View style={styles.settingItem}>
             <Text style={styles.settingLabel}>Notification Time</Text>
             <TouchableOpacity 
@@ -421,7 +463,7 @@ function SettingsScreen() {
               <Text style={styles.timeText}>{notificationTime}</Text>
             </TouchableOpacity>
           </View>
-        )}
+        )} */}
         
         <Modal
           visible={timeModalVisible}
