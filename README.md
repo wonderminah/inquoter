@@ -164,11 +164,7 @@ CopyEdit
 
 📌 번들 ID는 Expo `app.json` 또는 `app.config.js`에 적어야 해요:
 
-```
-json
-
-
-CopyEdit
+```json
 {
   "expo": {
     "ios": {
@@ -236,4 +232,34 @@ eas build --platform ios
 | 스크린샷           | iPhone 6.7", 6.1" 등용 최소 3장                        |
 | 개인정보 정책 링크 | 필요함 (외부 웹페이지 링크 또는 App Store에 직접 작성) |
 | 앱 설명/키워드     | 한글/영문 둘 다 가능                                   |
+
+```
+The Alchemist
+Paulo Coelho
+22
+When you want something, all the universe conspires in helping you to achieve it.
+
+
+Atomic Habits
+James Clear
+27
+You do not rise to the level of your goals. You fall to the level of your systems.
+
+1984
+George Orwell
+3
+Big Brother is Watching You.
+
+To Kill a Mockingbird
+Harper Lee
+39
+You never really understand a person until you consider things from his point of view...
+
+Sapiens: A Brief History of Humankind
+Yuval Noah Harari
+211
+You could never convince a monkey to give you a banana by promising him limitless bananas after death in monkey heaven.
+
+
+```
 

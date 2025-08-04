@@ -195,7 +195,7 @@ function QuotesScreen() {
   const renderList = ({ item }) => (
     <TouchableOpacity 
       style={styles.listItem}
-      onLongPress={() => showActionSheet(item)}
+      // onLongPress={() => showActionSheet(item)}
       delayLongPress={500}
     >
       <TouchableOpacity 
