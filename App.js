@@ -44,6 +44,8 @@ function QuotesScreen() {
   const [searchText, setSearchText] = useState('');
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'card'
   const slideAnim = useRef(new Animated.Value(-Dimensions.get('window').height)).current;
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingQuoteId, setEditingQuoteId] = useState(null);
 
   // 저장된 인용구 불러오기
   useEffect(() => {
@@ -97,15 +99,33 @@ function QuotesScreen() {
   };
 
   const openModal = () => {
+    setIsEditing(false);
+    setEditingQuoteId(null);
+    setBookName('');
+    setAuthor('');
+    setPage('');
+    setSentence('');
     setModalVisible(true);
   };
 
   const closeModal = () => {
     setModalVisible(false);
+    setIsEditing(false);
+    setEditingQuoteId(null);
     setBookName('');
     setAuthor('');
     setPage('');
     setSentence('');
+  };
+
+  const openEditModal = (quote) => {
+    setIsEditing(true);
+    setEditingQuoteId(quote.id);
+    setBookName(quote.bookName);
+    setAuthor(quote.author);
+    setPage(quote.page);
+    setSentence(quote.sentence);
+    setModalVisible(true);
   };
 
   // 검색된 필사 필터링
@@ -132,20 +152,40 @@ function QuotesScreen() {
       return;
     }
     
-    const newQuote = {
-      id: Date.now().toString(),
-      bookName: bookName.trim() || 'No Title',
-      author: author.trim() || 'No Author',
-      page: page.trim() || '',
-      sentence: sentence.trim(),
-      date: new Date().toLocaleString()
-    };
-    
-    console.log('newQuote:', newQuote);
-    const updatedQuotes = [newQuote, ...quotes];
-    setQuotes(updatedQuotes);
-    await saveQuotes(updatedQuotes);
-    console.log('quotes updated and saved, count:', updatedQuotes.length);
+    if (isEditing && editingQuoteId) {
+      // 편집 모드: 기존 인용구 업데이트
+      const updatedQuotes = quotes.map(quote => 
+        quote.id === editingQuoteId 
+          ? {
+              ...quote,
+              bookName: bookName.trim() || 'No Title',
+              author: author.trim() || 'No Author',
+              page: page.trim() || '',
+              sentence: sentence.trim(),
+              date: new Date().toLocaleString()
+            }
+          : quote
+      );
+      setQuotes(updatedQuotes);
+      await saveQuotes(updatedQuotes);
+      console.log('quote updated and saved');
+    } else {
+      // 새 인용구 추가
+      const newQuote = {
+        id: Date.now().toString(),
+        bookName: bookName.trim() || 'No Title',
+        author: author.trim() || 'No Author',
+        page: page.trim() || '',
+        sentence: sentence.trim(),
+        date: new Date().toLocaleString()
+      };
+      
+      console.log('newQuote:', newQuote);
+      const updatedQuotes = [newQuote, ...quotes];
+      setQuotes(updatedQuotes);
+      await saveQuotes(updatedQuotes);
+      console.log('quotes updated and saved, count:', updatedQuotes.length);
+    }
     closeModal();
   };
 
@@ -176,13 +216,15 @@ function QuotesScreen() {
         },
         (buttonIndex) => {
           if (buttonIndex === 0) {
-            console.log('편집 선택됨');
+            console.log('Edit selected');
             // 편집 선택 시 햅틱 피드백
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            openEditModal(quote);
           } else if (buttonIndex === 1) {
-            console.log('삭제 선택됨');
+            console.log('Delete selected');
             // 삭제 선택 시 햅틱 피드백
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+            deleteQuote(quote.id);
           }
         }
       );
@@ -195,7 +237,7 @@ function QuotesScreen() {
   const renderList = ({ item }) => (
     <TouchableOpacity 
       style={styles.listItem}
-      // onLongPress={() => showActionSheet(item)}
+      onLongPress={() => showActionSheet(item)}
       delayLongPress={500}
     >
       <TouchableOpacity 
@@ -296,7 +338,7 @@ function QuotesScreen() {
                 <Text style={styles.closeButtonText}>✕</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.saveButton} onPress={addQuote}>
-                <Text style={styles.saveButtonText}>Save</Text>
+                <Text style={styles.saveButtonText}>{isEditing ? 'Update' : 'Save'}</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.modalView}>
