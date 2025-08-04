@@ -24,7 +24,7 @@ function LibraryScreen() {
   return (
     <View style={styles.screenContainer}>
       <View style={styles.placeholderContent}>
-        <Text style={styles.placeholderText}>서재 기능이 곧 출시됩니다.</Text>
+        <Text style={styles.placeholderText}>Library feature coming soon.</Text>
       </View>
     </View>
   );
@@ -171,8 +171,8 @@ function QuotesScreen() {
       <View style={styles.listBookInfo}>
         <Text style={styles.listBookName}>{item.bookName}</Text>
         <View style={styles.listAuthorPageRow}>
-                  <Text style={styles.listAuthor}>저자: {item.author}</Text>
-        <Text style={[styles.listAuthor, styles.listPage]}>페이지: {item.page}</Text>
+                  <Text style={styles.listAuthor}>Author: {item.author}</Text>
+        <Text style={[styles.listAuthor, styles.listPage]}>Page: {item.page}</Text>
         </View>
       </View>
       <Text style={styles.listSentence}>{item.sentence}</Text>
@@ -200,7 +200,7 @@ function QuotesScreen() {
       </View>
       <View style={styles.cardAuthorInfo}>
         <Text style={styles.cardAuthor}>{item.author}</Text>
-        <Text style={styles.cardPage}>페이지: {item.page}</Text>
+        <Text style={styles.cardPage}>Page: {item.page}</Text>
       </View>
       <Text style={styles.cardSentence}>{item.sentence}</Text>
       <Text style={styles.cardDate}>{item.date}</Text>
@@ -212,7 +212,7 @@ function QuotesScreen() {
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="검색어를 입력하세요"
+          placeholder="Enter search term"
           value={searchText}
           onChangeText={setSearchText}
         />
@@ -220,7 +220,7 @@ function QuotesScreen() {
       
       <View style={styles.buttonRow}>
         <TouchableOpacity style={styles.button} onPress={openModal}>
-          <Text style={styles.buttonText}>새 인용구 작성</Text>
+          <Text style={styles.buttonText}>Write New Quote</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.viewToggleButton} onPress={() => setViewMode(viewMode === 'list' ? 'card' : 'list')}>
           <Text style={styles.viewToggleText}>{viewMode === 'list' ? '📋' : '📄'}</Text>
@@ -238,7 +238,7 @@ function QuotesScreen() {
         columnWrapperStyle={viewMode === 'card' ? styles.cardRow : null}
         ListEmptyComponent={
           <Text style={styles.emptyText}>
-            {searchText.trim() ? '검색 결과가 없습니다.' : '아직 인용구가 없습니다. 첫 번째 인용구를 작성해보세요!'}
+            {searchText.trim() ? 'No search results found.' : 'No quotes yet. Write your first quote!'}
           </Text>
         }
       />
@@ -256,40 +256,40 @@ function QuotesScreen() {
                 <Text style={styles.closeButtonText}>✕</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.saveButton} onPress={addQuote}>
-                <Text style={styles.saveButtonText}>작성</Text>
+                <Text style={styles.saveButtonText}>Save</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.modalView}>
-              <Text style={styles.inputLabel}>책 제목</Text>
+              <Text style={styles.inputLabel}>Book Title</Text>
               <TextInput
                 style={styles.textInput}
-                placeholder="책 제목을 입력하세요"
+                placeholder="Enter book title"
                 value={bookName}
                 onChangeText={setBookName}
                 autoFocus={true}
               />
               
-              <Text style={styles.inputLabel}>저자</Text>
+              <Text style={styles.inputLabel}>Author</Text>
               <TextInput
                 style={styles.textInput}
-                placeholder="저자명을 입력하세요"
+                placeholder="Enter author name"
                 value={author}
                 onChangeText={setAuthor}
               />
               
-              <Text style={styles.inputLabel}>페이지</Text>
+              <Text style={styles.inputLabel}>Page</Text>
               <TextInput
                 style={styles.textInput}
-                placeholder="페이지 번호를 입력하세요"
+                placeholder="Enter page number"
                 value={page}
                 onChangeText={setPage}
                 keyboardType="numeric"
               />
               
-              <Text style={styles.inputLabel}>인상깊은 문장</Text>
+              <Text style={styles.inputLabel}>Quote</Text>
               <TextInput
                 style={[styles.textInput, styles.sentenceInput]}
-                placeholder="인상깊은 문장을 입력하세요"
+                placeholder="Enter your quote"
                 value={sentence}
                 onChangeText={setSentence}
                 multiline={true}
@@ -308,20 +308,20 @@ function QuotesScreen() {
       >
         <View style={styles.centeredView}>
           <View style={styles.deleteModalView}>
-            <Text style={styles.deleteModalTitle}>인용구 삭제</Text>
-            <Text style={styles.deleteModalText}>이 인용구를 삭제하시겠습니까?</Text>
+            <Text style={styles.deleteModalTitle}>Delete Quote</Text>
+            <Text style={styles.deleteModalText}>Are you sure you want to delete this quote?</Text>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={[styles.button, styles.buttonClose]}
                 onPress={() => setDeleteModalVisible(false)}
               >
-                <Text style={styles.buttonText}>취소</Text>
+                <Text style={styles.buttonText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.button, styles.buttonDelete]}
                 onPress={confirmDelete}
               >
-                <Text style={styles.buttonText}>삭제</Text>
+                <Text style={styles.buttonText}>Delete</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -351,14 +351,14 @@ function SettingsScreen() {
       }
       
       if (finalStatus !== 'granted') {
-        Alert.alert('알림 권한이 필요합니다', '설정에서 알림을 허용해주세요.');
+        Alert.alert('Notification Permission Required', 'Please allow notifications in settings.');
         return false;
       }
       
       return true;
     }
     
-    Alert.alert('실제 기기에서만 알림이 작동합니다');
+    Alert.alert('Notifications only work on physical devices');
     return false;
   };
 
@@ -375,8 +375,8 @@ function SettingsScreen() {
       
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: "오늘의 인용구",
-          body: "새로운 인용구를 확인해보세요!",
+                  title: "Today's Quote",
+        body: "Check out a new quote!",
           data: { type: 'daily_quote' },
         },
         trigger: {
@@ -402,7 +402,7 @@ function SettingsScreen() {
     <View style={styles.screenContainer}>
       <View style={styles.settingsContainer}>
         <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>일일 인용구 알림</Text>
+          <Text style={styles.settingLabel}>Daily Quote Notifications</Text>
           <Switch
             value={notificationEnabled}
             onValueChange={toggleNotification}
@@ -413,7 +413,7 @@ function SettingsScreen() {
         
         {notificationEnabled && (
           <View style={styles.settingItem}>
-            <Text style={styles.settingLabel}>알림 시간</Text>
+            <Text style={styles.settingLabel}>Notification Time</Text>
             <TouchableOpacity 
               style={styles.timeButton}
               onPress={() => setTimeModalVisible(true)}
@@ -508,7 +508,7 @@ function SettingsScreen() {
         </Modal>
         
         <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>앱 버전</Text>
+          <Text style={styles.settingLabel}>App Version</Text>
           <Text style={styles.settingDescription}>1.0.0</Text>
         </View>
       </View>
@@ -518,11 +518,11 @@ function SettingsScreen() {
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
-  const [index, setIndex] = useState(1); // 필사 탭을 기본으로 설정
+  const [index, setIndex] = useState(1); // Quotes tab as default
   const [routes] = useState([
-    { key: 'library', title: '서재', icon: '' },
-    { key: 'quotes', title: '인용구', icon: '' },
-    { key: 'settings', title: '설정', icon: '' },
+    { key: 'library', title: 'Library', icon: '' },
+    { key: 'quotes', title: 'Quotes', icon: '' },
+    { key: 'settings', title: 'Settings', icon: '' },
   ]);
 
   // 폰트 로딩
@@ -554,7 +554,7 @@ export default function App() {
   if (!fontsLoaded) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>로딩 중...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
   }
