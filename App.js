@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, Modal, FlatList, Alert, KeyboardAvoidingView, ScrollView, TouchableWithoutFeedback, Keyboard, Animated, Dimensions, Image, Switch, ActionSheetIOS } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TabView, TabBar } from 'react-native-tab-view';
@@ -558,7 +559,7 @@ function SettingsScreen() {
     <View style={styles.screenContainer}>
       <View style={styles.settingsContainer}>
         {/* TODO: 알림 기능 추가 */}
-        {/* <View style={styles.settingItem}>
+        <View style={styles.settingItem}>
           <Text style={styles.settingLabel}>Daily Quote Notifications</Text>
           <Switch
             value={notificationEnabled}
@@ -566,10 +567,10 @@ function SettingsScreen() {
             trackColor={{ false: '#767577', true: '#a6969f' }}
             thumbColor={notificationEnabled ? '#f4f3f4' : '#f4f3f4'}
           />
-        </View> */}
+        </View>
         
         {/* TODO: 알림 기능 추가 */}
-        {/* {notificationEnabled && (
+        {notificationEnabled && (
           <View style={styles.settingItem}>
             <Text style={styles.settingLabel}>Notification Time</Text>
             <TouchableOpacity 
@@ -579,91 +580,57 @@ function SettingsScreen() {
               <Text style={styles.timeText}>{notificationTime}</Text>
             </TouchableOpacity>
           </View>
-        )} */}
+        )}
         
-        <Modal
-          visible={timeModalVisible}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={() => setTimeModalVisible(false)}
-        >
-          <View style={styles.timeModalOverlay}>
-            <View style={styles.timeModalContent}>
-              <Text style={styles.timeModalTitle}>알림 시간 설정</Text>
-              
-              <View style={styles.timePickerContainer}>
-                <View style={styles.timePickerColumn}>
-                  <Text style={styles.timePickerLabel}>시간</Text>
-                  <ScrollView style={styles.timePickerScroll} showsVerticalScrollIndicator={false}>
-                    {Array.from({length: 24}, (_, i) => (
-                      <TouchableOpacity
-                        key={i}
-                        style={[
-                          styles.timePickerItem,
-                          selectedHour === i && styles.timePickerItemSelected
-                        ]}
-                        onPress={() => setSelectedHour(i)}
-                      >
-                        <Text style={[
-                          styles.timePickerItemText,
-                          selectedHour === i && styles.timePickerItemTextSelected
-                        ]}>
-                          {i.toString().padStart(2, '0')}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
+        {Platform.OS === 'ios' && timeModalVisible && (
+          <Modal
+            visible={timeModalVisible}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={() => setTimeModalVisible(false)}
+          >
+            <View style={styles.timeModalOverlay}>
+              <View style={styles.timeModalContent}>
+                <View style={styles.timeModalHeader}>
+                  <TouchableOpacity
+                    style={styles.timeModalCancelButton}
+                    onPress={() => setTimeModalVisible(false)}
+                  >
+                    <Text style={styles.timeModalCancelText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.timeModalTitle}>Notification Time</Text>
+                  <TouchableOpacity
+                    style={styles.timeModalSaveButton}
+                    onPress={() => {
+                      const newTime = `${selectedHour.toString().padStart(2, '0')}:${selectedMinute.toString().padStart(2, '0')}`;
+                      setNotificationTime(newTime);
+                      setTimeModalVisible(false);
+                      scheduleNotification();
+                    }}
+                  >
+                    <Text style={styles.timeModalSaveText}>Save</Text>
+                  </TouchableOpacity>
                 </View>
                 
-                <Text style={styles.timePickerSeparator}>:</Text>
-                
-                <View style={styles.timePickerColumn}>
-                  <Text style={styles.timePickerLabel}>분</Text>
-                  <ScrollView style={styles.timePickerScroll} showsVerticalScrollIndicator={false}>
-                    {Array.from({length: 60}, (_, i) => (
-                      <TouchableOpacity
-                        key={i}
-                        style={[
-                          styles.timePickerItem,
-                          selectedMinute === i && styles.timePickerItemSelected
-                        ]}
-                        onPress={() => setSelectedMinute(i)}
-                      >
-                        <Text style={[
-                          styles.timePickerItemText,
-                          selectedMinute === i && styles.timePickerItemTextSelected
-                        ]}>
-                          {i.toString().padStart(2, '0')}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
+                <View style={styles.timePickerContainer}>
+                  <DateTimePicker
+                    value={new Date(2024, 0, 1, selectedHour, selectedMinute)}
+                    mode="time"
+                    display="spinner"
+                    textColor="black"
+                    onChange={(event, date) => {
+                      if (date) {
+                        setSelectedHour(date.getHours());
+                        setSelectedMinute(date.getMinutes());
+                      }
+                    }}
+                    style={styles.timePicker}
+                  />
                 </View>
-              </View>
-              
-              <View style={styles.timeModalButtons}>
-                <TouchableOpacity
-                  style={[styles.timeModalButton, styles.timeModalButtonCancel]}
-                  onPress={() => setTimeModalVisible(false)}
-                >
-                  <Text style={styles.timeModalButtonText}>취소</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.timeModalButton, styles.timeModalButtonSave]}
-                  onPress={() => {
-                    const newTime = `${selectedHour.toString().padStart(2, '0')}:${selectedMinute.toString().padStart(2, '0')}`;
-                    setNotificationTime(newTime);
-                    setTimeModalVisible(false);
-                    // 알림 스케줄 업데이트
-                    scheduleNotification();
-                  }}
-                >
-                  <Text style={styles.timeModalButtonText}>저장</Text>
-                </TouchableOpacity>
               </View>
             </View>
-          </View>
-        </Modal>
+          </Modal>
+        )}
         
         <View style={styles.settingItem}>
           <Text style={styles.settingLabel}>App Version</Text>
@@ -848,84 +815,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   timeModalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 24,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
     width: '80%',
     maxWidth: 350,
+    height: 300, // 고정 높이 설정
   },
   timeModalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 24,
+    fontSize: 18,
+    fontWeight: '600',
   },
   timePickerContainer: {
-    flexDirection: 'row',
+    alignItems: 'center',
+    height: 200, // 고정 높이 설정
     justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
   },
-  timePickerColumn: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  timePickerLabel: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
-  },
-  timePickerScroll: {
-    height: 120,
-    width: 80,
-  },
-  timePickerItem: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    marginVertical: 2,
-  },
-  timePickerItemSelected: {
-    backgroundColor: '#a6969f',
-  },
-  timePickerItemText: {
-    fontSize: 16,
-    color: '#333',
-    textAlign: 'center',
-  },
-  timePickerItemTextSelected: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  timePickerSeparator: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginHorizontal: 16,
-  },
-  timeModalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  timeModalButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginHorizontal: 8,
-  },
-  timeModalButtonCancel: {
-    backgroundColor: '#f0f0f0',
-  },
-  timeModalButtonSave: {
-    backgroundColor: '#a6969f',
-  },
-  timeModalButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
-    color: '#333',
-  },
+
   searchContainer: {
     marginBottom: 15,
   },
@@ -1312,5 +1218,31 @@ const styles = StyleSheet.create({
   activeTabLabel: {
     color: '#a6969f',
     fontWeight: '600',
+  },
+  timeModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom: 15,
+  },
+  timeModalCancelButton: {
+    paddingVertical: 5,
+  },
+  timeModalCancelText: {
+    fontSize: 17,
+    color: '#007AFF',
+  },
+  timeModalSaveButton: {
+    paddingVertical: 5,
+  },
+  timeModalSaveText: {
+    fontSize: 17,
+    color: '#007AFF',
+    fontWeight: '600',
+  },
+  timePicker: {
+    height: 200,
+    alignSelf: 'center',
+    color: '#black',
   },
 });
