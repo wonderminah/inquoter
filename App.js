@@ -279,13 +279,13 @@ function QuotesScreen() {
       </TouchableOpacity>
       <View style={styles.listBookInfo}>
         <Text style={styles.listBookName}>{item.bookName}</Text>
-        <View style={styles.listAuthorPageRow}>
-                  <Text style={styles.listAuthor}>Author: {item.author}</Text>
-        <Text style={[styles.listAuthor, styles.listPage]}>Page: {item.page}</Text>
-        </View>
+        <Text style={styles.listAuthor}>{item.author}</Text>
       </View>
       <Text style={styles.listSentence}>{item.sentence}</Text>
-      <Text style={styles.listDate}>{item.date}</Text>
+      <View style={styles.listBottomRow}>
+        <Text style={styles.listPage}>P.{item.page}</Text>
+        <Text style={styles.listDate}>{item.date}</Text>
+      </View>
     </TouchableOpacity>
   );
 
@@ -370,7 +370,9 @@ function QuotesScreen() {
               </TouchableOpacity>
             </View>
             <View style={styles.modalView}>
-              <Text style={styles.inputLabel}>Book Title</Text>
+              <Text style={styles.inputLabel}>
+                Book Title <Text style={styles.optionalText}>(Optional)</Text>
+              </Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="Enter book title"
@@ -379,7 +381,9 @@ function QuotesScreen() {
                 autoFocus={true}
               />
               
-              <Text style={styles.inputLabel}>Author</Text>
+              <Text style={styles.inputLabel}>
+                Author <Text style={styles.optionalText}>(Optional)</Text>
+              </Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="Enter author name"
@@ -387,7 +391,9 @@ function QuotesScreen() {
                 onChangeText={setAuthor}
               />
               
-              <Text style={styles.inputLabel}>Page</Text>
+              <Text style={styles.inputLabel}>
+                Page <Text style={styles.optionalText}>(Optional)</Text>
+              </Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="Enter page number"
@@ -396,7 +402,9 @@ function QuotesScreen() {
                 keyboardType="numeric"
               />
               
-              <Text style={styles.inputLabel}>Quote</Text>
+              <Text style={styles.inputLabel}>
+                Quote <Text style={styles.requiredText}>(Required)</Text>
+              </Text>
               <TextInput
                 style={[styles.textInput, styles.sentenceInput]}
                 placeholder="Enter your quote"
@@ -428,7 +436,9 @@ function QuotesScreen() {
               </TouchableOpacity>
             </View>
             <View style={styles.modalView}>                  
-              <Text style={styles.inputLabel}>Book Title</Text>
+              <Text style={styles.inputLabel}>
+                Book Title <Text style={styles.optionalText}>(Optional)</Text>
+              </Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="Enter book title"
@@ -437,7 +447,9 @@ function QuotesScreen() {
                 autoFocus={true}
               />
               
-              <Text style={styles.inputLabel}>Author</Text>
+              <Text style={styles.inputLabel}>
+                Author <Text style={styles.optionalText}>(Optional)</Text>
+              </Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="Enter author name"
@@ -445,7 +457,9 @@ function QuotesScreen() {
                 onChangeText={setEditAuthor}
               />
               
-              <Text style={styles.inputLabel}>Page</Text>
+              <Text style={styles.inputLabel}>
+                Page <Text style={styles.optionalText}>(Optional)</Text>
+              </Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="Enter page number"
@@ -454,7 +468,9 @@ function QuotesScreen() {
                 keyboardType="numeric"
               />
               
-              <Text style={styles.inputLabel}>Quote</Text>
+              <Text style={styles.inputLabel}>
+                Quote <Text style={styles.optionalText}>(Required)</Text>
+              </Text>
               <TextInput
                 style={[styles.textInput, styles.sentenceInput]}
                 placeholder="Enter your quote"
@@ -1020,7 +1036,16 @@ const styles = StyleSheet.create({
   listDate: {
     fontSize: 12,
     color: '#999',
-    textAlign: 'right',
+  },
+  listBottomRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 5,
+  },
+  listPage: {
+    fontSize: 12,
+    color: '#666',
   },
   cardRow: {
     justifyContent: 'space-between',
@@ -1160,6 +1185,16 @@ const styles = StyleSheet.create({
     color: '#333',
     alignSelf: 'flex-start',
     marginBottom: 5,
+  },
+  optionalText: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#999',
+  },
+  requiredText: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: '#666',
   },
   textInput: {
     // borderWidth: 1,
