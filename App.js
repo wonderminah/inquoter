@@ -34,8 +34,6 @@ function LibraryScreen() {
 // 필사 화면 컴포넌트
 function QuotesScreen() {
   const [modalVisible, setModalVisible] = useState(false);
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [selectedQuoteId, setSelectedQuoteId] = useState(null);
   const [bookName, setBookName] = useState('');
   const [author, setAuthor] = useState('');
   const [page, setPage] = useState('');
@@ -211,16 +209,25 @@ function QuotesScreen() {
   };
 
   const deleteQuote = (id) => {
-    setSelectedQuoteId(id);
-    setDeleteModalVisible(true);
-  };
-
-  const confirmDelete = async () => {
-    const updatedQuotes = quotes.filter(quote => quote.id !== selectedQuoteId);
-    setQuotes(updatedQuotes);
-    await saveQuotes(updatedQuotes);
-    setDeleteModalVisible(false);
-    setSelectedQuoteId(null);
+    Alert.alert(
+      'Delete Quote',
+      'Are you sure you want to delete this quote?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            const updatedQuotes = quotes.filter(quote => quote.id !== id);
+            setQuotes(updatedQuotes);
+            await saveQuotes(updatedQuotes);
+          },
+        },
+      ]
+    );
   };
 
   const showActionSheet = (quote) => {
@@ -460,34 +467,6 @@ function QuotesScreen() {
           </View>
         </Modal>
       )}
-
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={deleteModalVisible}
-        onRequestClose={() => setDeleteModalVisible(false)}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.deleteModalView}>
-            <Text style={styles.deleteModalTitle}>Delete Quote</Text>
-            <Text style={styles.deleteModalText}>Are you sure you want to delete this quote?</Text>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => setDeleteModalVisible(false)}
-              >
-                <Text style={styles.buttonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.button, styles.buttonDelete]}
-                onPress={confirmDelete}
-              >
-                <Text style={styles.buttonText}>Delete</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
