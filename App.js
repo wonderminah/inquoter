@@ -162,9 +162,9 @@ function QuotesScreen() {
     
     const newQuote = {
       id: Date.now().toString(),
-      bookName: bookName.trim() || 'No Title',
-      author: author.trim() || 'No Author',
-      page: page.trim() || '',
+      bookName: bookName.trim() || null,
+      author: author.trim() || null,
+      page: page.trim() || null,
       sentence: sentence.trim(),
       date: new Date().toLocaleString()
     };
@@ -194,9 +194,9 @@ function QuotesScreen() {
       quote.id === editingQuoteId 
         ? {
             ...quote,
-            bookName: editBookName.trim() || 'No Title',
-            author: editAuthor.trim() || 'No Author',
-            page: editPage.trim() || '',
+            bookName: editBookName.trim() || null,
+            author: editAuthor.trim() || null,
+            page: editPage.trim() || null,
             sentence: editSentence.trim(),
             date: new Date().toLocaleString()
           }
@@ -277,15 +277,15 @@ function QuotesScreen() {
           style={styles.deleteButtonImage}
         />
       </TouchableOpacity>
-      <View style={styles.listBookInfo}>
-        <Text style={styles.listBookName}>{item.bookName}</Text>
-        <Text style={styles.listAuthor}>{item.author}</Text>
-      </View>
+        <View style={styles.listBookInfo}>
+          <Text style={styles.listBookName}>{item.bookName || 'No Title'}</Text>
+          <Text style={styles.listAuthor}>{item.author || 'No Author'}</Text>
+        </View>
       <Text style={styles.listSentence}>{item.sentence}</Text>
-      <View style={styles.listBottomRow}>
-        <Text style={styles.listPage}>P.{item.page}</Text>
-        <Text style={styles.listDate}>{item.date}</Text>
-      </View>
+        <View style={styles.listBottomRow}>
+          <Text style={styles.listPage}>{item.page ? `P.${item.page}` : 'No Page'}</Text>
+          <Text style={styles.listDate}>{item.date}</Text>
+        </View>
     </TouchableOpacity>
   );
 
@@ -296,7 +296,7 @@ function QuotesScreen() {
       delayLongPress={500}
     >
       <View style={styles.cardHeader}>
-        <Text style={styles.cardBookName}>{item.bookName}</Text>
+        <Text style={styles.cardBookName}>{item.bookName || 'No Title'}</Text>
         <TouchableOpacity 
           style={styles.cardDeleteButton}
           onPress={() => deleteQuote(item.id)}
@@ -307,10 +307,10 @@ function QuotesScreen() {
           />
         </TouchableOpacity>
       </View>
-      <View style={styles.cardAuthorInfo}>
-        <Text style={styles.cardAuthor}>{item.author}</Text>
-        <Text style={styles.cardPage}>Page: {item.page}</Text>
-      </View>
+              <View style={styles.cardAuthorInfo}>
+          <Text style={styles.cardAuthor}>{item.author || 'No Author'}</Text>
+          <Text style={styles.cardPage}>{item.page ? `P.${item.page}` : 'No Page'}</Text>
+        </View>
       <Text style={styles.cardSentence}>{item.sentence}</Text>
       <Text style={styles.cardDate}>{item.date}</Text>
     </TouchableOpacity>
@@ -952,7 +952,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 8,
     flex: 1,
-    marginRight: 8,
+    // marginRight: 8,
   },
   viewToggleButton: {
     backgroundColor: '#f0f0f0',
