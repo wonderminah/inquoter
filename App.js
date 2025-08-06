@@ -44,6 +44,14 @@ function QuotesScreen() {
   const [searchText, setSearchText] = useState('');
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'card'
   const slideAnim = useRef(new Animated.Value(-Dimensions.get('window').height)).current;
+  
+  // 편집 모달 상태 (완전히 독립적)
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editBookName, setEditBookName] = useState('');
+  const [editAuthor, setEditAuthor] = useState('');
+  const [editPage, setEditPage] = useState('');
+  const [editSentence, setEditSentence] = useState('');
+  const [editingQuoteId, setEditingQuoteId] = useState(null);
 
   // 저장된 인용구 불러오기
   useEffect(() => {
@@ -97,6 +105,10 @@ function QuotesScreen() {
   };
 
   const openModal = () => {
+    setBookName('');
+    setAuthor('');
+    setPage('');
+    setSentence('');
     setModalVisible(true);
   };
 
@@ -106,6 +118,24 @@ function QuotesScreen() {
     setAuthor('');
     setPage('');
     setSentence('');
+  };
+
+  const openEditModal = (quote) => {
+    setEditBookName(quote.bookName);
+    setEditAuthor(quote.author);
+    setEditPage(quote.page);
+    setEditSentence(quote.sentence);
+    setEditingQuoteId(quote.id);
+    setEditModalVisible(true);
+  };
+
+  const closeEditModal = () => {
+    setEditModalVisible(false);
+    setEditBookName('');
+    setEditAuthor('');
+    setEditPage('');
+    setEditSentence('');
+    setEditingQuoteId(null);
   };
 
   // 검색된 필사 필터링
@@ -149,6 +179,37 @@ function QuotesScreen() {
     closeModal();
   };
 
+  const updateQuote = async () => {
+    console.log('updateQuote called');
+    console.log('editSentence:', editSentence);
+    console.log('editBookName:', editBookName);
+    console.log('editAuthor:', editAuthor);
+    console.log('editPage:', editPage);
+    
+    if (!editSentence.trim()) {
+      Alert.alert('Input Error', 'Please enter a quote.');
+      return;
+    }
+    
+    // 기존 인용구 업데이트
+    const updatedQuotes = quotes.map(quote => 
+      quote.id === editingQuoteId 
+        ? {
+            ...quote,
+            bookName: editBookName.trim() || 'No Title',
+            author: editAuthor.trim() || 'No Author',
+            page: editPage.trim() || '',
+            sentence: editSentence.trim(),
+            date: new Date().toLocaleString()
+          }
+        : quote
+    );
+    setQuotes(updatedQuotes);
+    await saveQuotes(updatedQuotes);
+    console.log('quote updated and saved');
+    closeEditModal();
+  };
+
   const deleteQuote = (id) => {
     setSelectedQuoteId(id);
     setDeleteModalVisible(true);
@@ -174,17 +235,19 @@ function QuotesScreen() {
           cancelButtonIndex: 2,
           destructiveButtonIndex: 1,
         },
-        (buttonIndex) => {
-          if (buttonIndex === 0) {
-            console.log('편집 선택됨');
-            // 편집 선택 시 햅틱 피드백
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          } else if (buttonIndex === 1) {
-            console.log('삭제 선택됨');
-            // 삭제 선택 시 햅틱 피드백
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                  (buttonIndex) => {
+            if (buttonIndex === 0) {
+              console.log('편집 선택됨');
+              // 편집 선택 시 햅틱 피드백
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              openEditModal(quote);
+            } else if (buttonIndex === 1) {
+              console.log('삭제 선택됨');
+              // 삭제 선택 시 햅틱 피드백
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+              deleteQuote(quote.id);
+            }
           }
-        }
       );
     } else {
       // Alert.alert('편집');
@@ -195,7 +258,7 @@ function QuotesScreen() {
   const renderList = ({ item }) => (
     <TouchableOpacity 
       style={styles.listItem}
-      // onLongPress={() => showActionSheet(item)}
+      onLongPress={() => showActionSheet(item)}
       delayLongPress={500}
     >
       <TouchableOpacity 
@@ -332,6 +395,64 @@ function QuotesScreen() {
                 placeholder="Enter your quote"
                 value={sentence}
                 onChangeText={setSentence}
+                multiline={true}
+                numberOfLines={4}
+              />
+            </View>
+          </View>
+        </Modal>
+      )}
+
+      {/* 편집 모달 */}
+      {editModalVisible && (
+        <Modal
+          animationType="fade"
+          transparent={false}
+          visible={editModalVisible}
+          onRequestClose={closeEditModal}
+        >
+          <View style={styles.fullScreenModal}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity style={styles.closeButton} onPress={closeEditModal}>
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.saveButton} onPress={updateQuote}>
+                <Text style={styles.updateButtonText}>Update</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.modalView}>                  
+              <Text style={styles.inputLabel}>Book Title</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Enter book title"
+                value={editBookName}
+                onChangeText={setEditBookName}
+                autoFocus={true}
+              />
+              
+              <Text style={styles.inputLabel}>Author</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Enter author name"
+                value={editAuthor}
+                onChangeText={setEditAuthor}
+              />
+              
+              <Text style={styles.inputLabel}>Page</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Enter page number"
+                value={editPage}
+                onChangeText={setEditPage}
+                keyboardType="numeric"
+              />
+              
+              <Text style={styles.inputLabel}>Quote</Text>
+              <TextInput
+                style={[styles.textInput, styles.sentenceInput]}
+                placeholder="Enter your quote"
+                value={editSentence}
+                onChangeText={setEditSentence}
                 multiline={true}
                 numberOfLines={4}
               />
@@ -1140,6 +1261,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   saveButtonText: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: '600',
+  },
+  updateButtonText: {
     fontSize: 16,
     color: '#fff',
     fontWeight: '600',
